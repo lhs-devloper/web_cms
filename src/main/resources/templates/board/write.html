@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Write Post - ' + ${board.boardId}">Write Post</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <!-- Quill Rich Text Editor (MIT License) -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <style>
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1.5px solid var(--border);
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 400px;
+            resize: vertical;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="/" style="text-decoration: none; color: inherit;" th:text="${siteSetting.siteName}">CMS PRO</a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/" th:text="#{common.home}">Home</a></li>
+            <li><a th:href="@{/board/{id}(id=${board.boardId})}" th:text="${board.boardId}">Board</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="/admin" class="btn-primary" th:text="#{common.dashboard}">Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 800px;">
+        <div style="margin-bottom: 3rem;">
+            <h1 style="font-size: 2.5rem; font-weight: 900; letter-spacing: -0.04em;">Write New Post</h1>
+            <p style="color: var(--text-muted); margin-top: 0.5rem;"
+                th:text="'Posting on ' + ${board.boardId} + ' board'"></p>
+        </div>
+
+        <form th:action="@{/board/{id}/save(id=${board.boardId})}" method="POST" class="post-view"
+            style="padding: 3rem;">
+            <div class="form-group">
+                <label class="form-label">Post Title</label>
+                <input type="text" name="title" class="form-input" placeholder="Enter a catchy title..." required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Author Name</label>
+                <input type="text" name="author" class="form-input" placeholder="Your name" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Content</label>
+                <!-- Hidden input to store HTML content for submission -->
+                <input type="hidden" name="content" id="contentInput">
+                <div id="editor" style="height: 400px; background: white; border-radius: 0.75rem;"></div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 3rem;">
+                <a th:href="@{/board/{id}(id=${board.boardId})}"
+                    style="padding: 1rem 2rem; color: var(--text-muted); text-decoration: none; font-weight: 700;">Cancel</a>
+                <button type="submit" class="btn-primary" style="padding: 1rem 3rem; font-size: 1.1rem;">Publish
+                    Post</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Initialize Quill editor
+        var quill = new Quill('#editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: {
+                    container: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        ['link', 'image'],
+                        ['clean']
+                    ],
+                    handlers: {
+                        image: imageHandler
+                    }
+                }
+            },
+            placeholder: 'Share your thoughts with rich text...'
+        });
+
+        // Custom Image Handler for Server Upload
+        function imageHandler() {
+            var input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            input.click();
+
+            input.onchange = function () {
+                var file = input.files[0];
+                var formData = new FormData();
+                formData.append('file', file);
+
+                // Upload to server
+                fetch('/api/files/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        const range = quill.getSelection();
+                        quill.insertEmbed(range.index, 'image', result.url);
+                    })
+                    .catch(error => {
+                        console.error('Error uploading image:', error);
+                        alert('Image upload failed.');
+                    });
+            };
+        }
+
+        // Sync Quill content to hidden input before form submission
+        document.querySelector('form').onsubmit = function () {
+            var content = document.querySelector('#contentInput');
+            content.value = quill.root.innerHTML;
+        };
+    </script>
+
+    <footer>
+        <p th:text="${siteSetting.footerCopyright}">© 2024 All rights reserved.</p>
+    </footer>
+</body>
+
+</html>

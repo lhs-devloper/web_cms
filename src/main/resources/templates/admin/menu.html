@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{common.title} + ' - ' + #{menu.title}">Menu Management - CMS PRO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <!-- SortableJS (MIT License) -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <style>
+        .sortable-ghost {
+            opacity: 0.4;
+            background-color: #e0e7ff !important;
+        }
+
+        .drag-handle {
+            cursor: grab;
+            color: #cbd5e1;
+            padding-right: 1rem;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+    </style>
+</head>
+
+<body>
+    <aside th:replace="~{admin/fragments/sidebar :: sidebar('menu')}"></aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div class="search-bar">
+                <i class="fas fa-sitemap" style="margin-right: 0.5rem;"></i>
+                <span th:text="#{menu.title}">Menu Management</span>
+            </div>
+            <div class="user-profile" style="display: flex; align-items: center; gap: 1rem;">
+                <div
+                    style="width: 40px; height: 40px; background: #6366f1; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                    AD
+                </div>
+                <span style="font-weight: 600; color: #1e293b;">Administrator</span>
+            </div>
+        </header>
+
+        <main class="content-body">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem;">
+                <div>
+                    <h2 style="font-weight: 800; font-size: 1.75rem;" th:text="#{menu.title}">Menu Management</h2>
+                    <p style="color: #64748b; margin-top: 0.5rem;">Configure your site's header navigation hierarchy
+                        with drag-and-drop reordering.</p>
+                </div>
+            </div>
+
+            <!-- Alerts -->
+            <div th:if="${message}"
+                style="background: #dcfce7; color: #166534; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem; border: 1px solid #bbf7d0;">
+                <i class="fas fa-check-circle"></i> <span th:text="${message}"></span>
+            </div>
+            <div th:if="${error}"
+                style="background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem; border: 1px solid #fecaca;">
+                <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 350px 1fr; gap: 2rem;">
+                <!-- Add/Edit Form -->
+                <section class="data-section" style="padding: 2rem;">
+                    <h4 style="margin-bottom: 1.5rem; font-weight: 700;" th:text="#{menu.create}">Add Menu Item</h4>
+                    <form th:action="@{/admin/menu/save}" method="POST">
+                        <div class="form-group">
+                            <label th:text="#{menu.table.1depth}">1st Depth Menu</label>
+                            <input type="text" name="main1Depth" class="form-control" placeholder="e.g. Products"
+                                list="depth1List" required>
+                            <datalist id="depth1List">
+                                <option th:each="val : ${existing1Depths}" th:value="${val}"></option>
+                            </datalist>
+                        </div>
+                        <div class="form-group" style="margin-top: 1.5rem;">
+                            <label th:text="#{menu.table.2depth}">2nd Depth Menu (Optional)</label>
+                            <input type="text" name="main2Depth" class="form-control" placeholder="e.g. Software">
+                            <p class="form-hint">Leave blank if this is a top-level menu only.</p>
+                        </div>
+                        <div class="form-group" style="margin-top: 1.5rem;">
+                            <label th:text="#{menu.table.link}">Link URL</label>
+                            <input type="text" name="link" class="form-control" placeholder="e.g. /products/sw"
+                                list="linkList" required>
+                            <datalist id="linkList">
+                                <option th:each="link : ${existingLinks}" th:value="${link}"></option>
+                                <option value="/">/ (Home)</option>
+                                <option value="/board">/board (Full Directory)</option>
+                            </datalist>
+                        </div>
+                        <button type="submit" class="btn-save" style="width: 100%; margin-top: 2rem;"
+                            th:text="#{common.save}">Save Menu</button>
+                    </form>
+                </section>
+
+                <!-- Menu List -->
+                <section class="data-section">
+                    <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 1rem;"><i
+                            class="fas fa-info-circle"></i> Drag the icons to reorder menus in real-time.</p>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border);">
+                                <th style="width: 40px;"></th>
+                                <th style="text-align: left; padding: 1.25rem 1rem;" th:text="#{menu.table.1depth}">1st
+                                    Depth</th>
+                                <th style="text-align: left; padding: 1.25rem 1rem;" th:text="#{menu.table.2depth}">2nd
+                                    Depth</th>
+                                <th style="text-align: left; padding: 1.25rem 1rem;" th:text="#{menu.table.link}">Link
+                                </th>
+                                <th style="text-align: right; padding: 1.25rem 1rem;" th:text="#{menu.table.actions}">
+                                    Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="menu-list">
+                            <tr th:each="menu : ${menus}" th:data-id="${menu.id}"
+                                style="border-bottom: 1px solid var(--border); background: white;">
+                                <td style="padding-left: 1rem;"><i class="fas fa-grip-vertical drag-handle"></i></td>
+                                <td style="padding: 1.25rem 1rem; font-weight: 700; color: #1e293b;"
+                                    th:text="${menu.main1Depth}"></td>
+                                <td style="padding: 1.25rem 1rem; color: #6366f1; font-weight: 500;"
+                                    th:text="${menu.main2Depth ?: '-'}"></td>
+                                <td style="padding: 1.25rem 1rem; color: #64748b; font-family: monospace;"
+                                    th:text="${menu.link}"></td>
+                                <td style="padding: 1.25rem 1rem; text-align: right;">
+                                    <form th:action="@{/admin/menu/delete}" method="POST"
+                                        onsubmit="return confirm('Delete this menu item?');" style="display: inline;">
+                                        <input type="hidden" name="id" th:value="${menu.id}">
+                                        <button type="submit"
+                                            style="background: none; border: none; color: #94a3b8; cursor: pointer; transition: color 0.2s;"
+                                            onmouseover="this.style.color='#ef4444'"
+                                            onmouseout="this.style.color='#94a3b8'">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(menus)}" id="empty-row">
+                                <td colspan="5" style="padding: 4rem; text-align: center; color: #94a3b8;">No menus
+                                    defined.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize Sortable
+        const el = document.getElementById('menu-list');
+        const sortable = Sortable.create(el, {
+            handle: '.drag-handle',
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            onEnd: function() {
+                const ids = Array.from(el.children)
+                    .filter(child => child.dataset.id)
+                    .map(child => child.dataset.id);
+                
+                // Send reorder request to server
+                fetch('/admin/menu/reorder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(ids)
+                }).then(response => {
+                    if (!response.ok) {
+                        alert('Failed to update menu order.');
+                    }
+                }).catch(err => {
+                    console.error('Error:', err);
+                    alert('An error occurred while reordering.');
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

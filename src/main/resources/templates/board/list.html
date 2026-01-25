@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Dynamic SEO -->
+    <title th:text="${board.boardId} + ' - ' + ${siteSetting.siteName}">Board List</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="/" style="text-decoration: none; color: inherit;" th:text="${siteSetting.siteName}">CMS PRO</a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/" th:text="#{common.home}">Home</a></li>
+            <li><a th:href="@{/board/{id}(id=${board.boardId})}" th:text="${board.boardId}"
+                    style="color: var(--primary);">Board</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="/admin" class="btn-primary" th:text="#{common.dashboard}">Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="board-header">
+            <div class="board-title">
+                <h2 th:text="${board.boardId}">Board Name</h2>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">Total <span
+                        th:text="${#lists.size(posts)}">0</span> posts</p>
+            </div>
+            <a th:href="@{/board/{id}/write(id=${board.boardId})}" class="btn-primary">
+                <i class="fas fa-pen" style="margin-right: 0.5rem;"></i> Write Post
+            </a>
+        </div>
+
+        <table class="post-table">
+            <thead>
+                <tr>
+                    <th style="width: 80px;">No.</th>
+                    <th>Title</th>
+                    <th style="width: 150px;">Author</th>
+                    <th style="width: 150px;">Date</th>
+                    <th style="width: 100px;">Views</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="post : ${posts}">
+                    <td th:text="${post.id}">1</td>
+                    <td>
+                        <a th:href="@{/board/{boardId}/view/{id}(boardId=${board.boardId}, id=${post.id})}"
+                            class="post-title" th:text="${post.title}">Post Title</a>
+                        <i th:if="${post.is_secret}" class="fas fa-lock"
+                            style="font-size: 0.8rem; color: #94a3b8; margin-left: 0.5rem;"></i>
+                    </td>
+                    <td th:text="${post.author}">Author</td>
+                    <td th:text="${#dates.format(post.created_at, 'yyyy-MM-dd')}">2024-03-24</td>
+                    <td th:text="${post.view_count}">0</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(posts)}">
+                    <td colspan="5" style="padding: 5rem; text-align: center; color: var(--text-muted);">
+                        <i class="fas fa-inbox" style="font-size: 2rem; display: block; margin-bottom: 1rem;"></i>
+                        No posts yet. Be the first to write!
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        <p th:text="${siteSetting.footerCopyright}">© 2024 All rights reserved.</p>
+    </footer>
+</body>
+
+</html>

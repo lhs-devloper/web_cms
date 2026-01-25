@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{common.settings} + ' - ' + #{common.title}">Site Settings - CMS PRO</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+
+<body>
+    <aside th:replace="~{admin/fragments/sidebar :: sidebar('setting')}"></aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div class="search-bar">
+                <i class="fas fa-cog" style="margin-right: 0.5rem;"></i>
+                <span th:text="#{common.settings}">Site Settings</span>
+            </div>
+            <div class="user-profile">
+                <div
+                    style="width: 40px; height: 40px; background: #6366f1; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                    AD
+                </div>
+                <span style="font-weight: 600; color: #1e293b;">Administrator</span>
+            </div>
+        </header>
+
+        <main class="content-body">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 3rem;">
+                <div>
+                    <h2 style="font-weight: 800; font-size: 1.75rem; letter-spacing: -0.025em; color: #1e293b;"
+                        th:text="#{settings.general.title}">SEO & Site Configuration</h2>
+                    <p style="color: #64748b; margin-top: 0.5rem; max-width: 600px;" th:text="#{settings.general.desc}">
+                        Fine-tune how your site appears in search engines and social media platforms.</p>
+                </div>
+                <button type="submit" form="settingsForm" class="btn-save">
+                    <i class="fas fa-save" style="margin-right: 0.5rem;"></i> <span th:text="#{common.save}">Save
+                        Changes</span>
+                </button>
+            </div>
+
+            <!-- Alerts -->
+            <div th:if="${message}"
+                style="background: #dcfce7; color: #166534; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem; border: 1px solid #bbf7d0;">
+                <i class="fas fa-check-circle"></i> <span th:text="${message}"></span>
+            </div>
+
+            <form id="settingsForm" th:action="@{/admin/setting/save}" th:object="${siteSetting}" method="POST">
+                <input type="hidden" th:field="*{id}">
+
+                <div class="settings-container">
+                    <!-- Section 1: Meta Tags -->
+                    <section class="settings-section">
+                        <h4 th:text="#{settings.profile.title}">1. Meta Tags (SEO)</h4>
+                        <div class="form-group">
+                            <label th:text="#{settings.profile.site_name}">Internal Site Name</label>
+                            <input type="text" th:field="*{siteName}" class="form-control"
+                                th:placeholder="#{settings.profile.site_name.hint}">
+                        </div>
+                        <div class="form-group">
+                            <label th:text="#{settings.profile.meta_title}">Meta Title</label>
+                            <input type="text" th:field="*{metaTitle}" class="form-control"
+                                th:placeholder="#{settings.profile.meta_title.hint}">
+                        </div>
+                        <div class="form-group">
+                            <label th:text="#{settings.profile.meta_desc}">Meta Description</label>
+                            <textarea th:field="*{metaDescription}" class="form-control"
+                                style="height: 100px;"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label th:text="#{settings.profile.meta_keywords}">Meta Keywords</label>
+                            <input type="text" th:field="*{metaKeywords}" class="form-control"
+                                placeholder="comma, separated, keywords">
+                        </div>
+                    </section>
+
+                    <!-- Section 2: Open Graph -->
+                    <section class="settings-section">
+                        <h4 th:text="#{settings.og.title}">2. Social Sharing (OG)</h4>
+                        <p style="color: #64748b; font-size: 0.875rem; margin-bottom: 1.5rem;"
+                            th:text="#{settings.og.desc}">Control how your site looks when shared on Kakao, Facebook,
+                            etc.</p>
+                        <div class="form-group">
+                            <label th:text="#{settings.og.card_title}">OG Title</label>
+                            <input type="text" th:field="*{ogTitle}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label th:text="#{settings.og.card_desc}">OG Description</label>
+                            <textarea th:field="*{ogDescription}" class="form-control" style="height: 80px;"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label th:text="#{settings.og.image}">OG Image URL</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" th:id="ogImage" th:field="*{ogImage}" class="form-control"
+                                    placeholder="https://example.com/share-image.jpg">
+                                <button type="button" class="btn-primary" onclick="triggerUpload('ogImage')"
+                                    style="background: #334155; white-space: nowrap; padding: 0 1rem; border: none; border-radius: 0.5rem; color: white; cursor: pointer;">
+                                    <i class="fas fa-upload"></i> <span th:text="#{common.upload}">Upload</span>
+                                </button>
+                            </div>
+                            <p class="form-hint"
+                                style="color: #6366f1; display: flex; align-items: center; gap: 0.4rem; margin-top: 0.5rem; font-weight: 500;">
+                                <i class="fas fa-info-circle"></i>
+                                <span th:text="#{settings.og.image.hint}">Recommended size: 1200 x 630...</span>
+                            </p>
+                            <div id="ogImage-preview" class="image-preview-container"
+                                style="margin-top: 0.75rem; display: none;">
+                                <img src=""
+                                    style="max-height: 100px; border-radius: 0.5rem; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Section 3: Branding -->
+                    <section class="settings-section">
+                        <h4 th:text="#{settings.semantic.title}">3. Branding & Semantics</h4>
+                        <div class="form-group">
+                            <label th:text="#{settings.semantic.logo_url}">Logo URL</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="logoUrl" th:field="*{logoUrl}" class="form-control">
+                                <button type="button" class="btn-primary" onclick="triggerUpload('logoUrl')"
+                                    style="background: #334155; white-space: nowrap; padding: 0 1rem; border: none; border-radius: 0.5rem; color: white; cursor: pointer;">
+                                    <i class="fas fa-upload"></i> <span th:text="#{common.upload}">Upload</span>
+                                </button>
+                            </div>
+                            <div id="logoUrl-preview" class="image-preview-container"
+                                style="margin-top: 0.75rem; display: none;">
+                                <img src=""
+                                    style="max-height: 80px; border-radius: 0.5rem; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label th:text="#{settings.semantic.logo_alt}">Logo Alt Text</label>
+                            <input type="text" th:field="*{logoAltText}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label th:text="#{settings.semantic.footer}">Footer Copyright</label>
+                            <input type="text" th:field="*{footerCopyright}" class="form-control">
+                        </div>
+                    </section>
+
+                    <input type="file" id="imageUploadInput" style="display: none;" accept="image/*">
+
+                    <!-- Section 4: Advanced -->
+                    <section class="settings-section">
+                        <h4 th:text="#{settings.adv.title}">4. Advanced & Scripts</h4>
+                        <div class="form-group">
+                            <label th:text="#{settings.adv.canonical}">Canonical URL</label>
+                            <input type="text" th:field="*{canonicalUrl}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label th:text="#{settings.adv.ga}">Google Analytics ID</label>
+                            <input type="text" th:field="*{googleAnalyticsId}" class="form-control"
+                                placeholder="G-XXXXXXXXXX">
+                        </div>
+                        <div class="form-group">
+                            <label th:text="#{settings.adv.robots}">Robots.txt Content</label>
+                            <textarea th:field="*{robotsTxt}" class="form-control"
+                                style="height: 100px; font-family: monospace;"></textarea>
+                        </div>
+                    </section>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <script>
+        let currentTargetId = '';
+
+        function triggerUpload(targetId) {
+            currentTargetId = targetId;
+            document.getElementById('imageUploadInput').click();
+        }
+
+        function updatePreview(id, url) {
+            const previewContainer = document.getElementById(id + '-preview');
+            if (!previewContainer) return;
+
+            const img = previewContainer.querySelector('img');
+            if (url && url.trim() !== '') {
+                img.src = url;
+                previewContainer.style.display = 'block';
+            } else {
+                previewContainer.style.display = 'none';
+            }
+        }
+
+        // Initialize previews on load
+        window.addEventListener('DOMContentLoaded', () => {
+            ['ogImage', 'logoUrl'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    updatePreview(id, input.value);
+                    // Also update on manual input change
+                    input.addEventListener('input', (e) => updatePreview(id, e.target.value));
+                    input.addEventListener('change', (e) => updatePreview(id, e.target.value));
+                }
+            });
+        });
+
+        document.getElementById('imageUploadInput').addEventListener('change', function (e) {
+            if (!this.files || this.files.length === 0) return;
+
+            const file = this.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const btn = document.querySelector(`button[onclick="triggerUpload('${currentTargetId}')"]`);
+            const originalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            fetch('/api/files/upload', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.url) {
+                        const input = document.getElementById(currentTargetId);
+                        input.value = data.url;
+                        updatePreview(currentTargetId, data.url);
+                    } else {
+                        alert('Upload failed: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred during upload.');
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                    this.value = '';
+                });
+        });
+    </script>
+</body>
+
+</html>

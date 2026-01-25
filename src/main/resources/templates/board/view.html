@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${post.title} + ' - ' + ${board.boardId}">Post View</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="/" style="text-decoration: none; color: inherit;" th:text="${siteSetting.siteName}">CMS PRO</a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/" th:text="#{common.home}">Home</a></li>
+            <li><a th:href="@{/board/{id}(id=${board.boardId})}" th:text="${board.boardId}">Board</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="/admin" class="btn-primary" th:text="#{common.dashboard}">Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 800px;">
+        <div style="margin-bottom: 2rem;">
+            <a th:href="@{/board/{id}(id=${board.boardId})}"
+                style="color: var(--text-muted); text-decoration: none; font-weight: 600;">
+                <i class="fas fa-chevron-left" style="margin-right: 0.5rem;"></i> Back to List
+            </a>
+        </div>
+
+        <article class="post-view">
+            <header class="post-view-header">
+                <h1 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1.5rem;"
+                    th:text="${post.title}">Post Title</h1>
+                <div style="display: flex; gap: 1.5rem; color: var(--text-muted); font-size: 0.95rem;">
+                    <span><i class="far fa-user" style="margin-right: 0.5rem;"></i> <strong
+                            style="color: var(--text-main);" th:text="${post.author}">Author</strong></span>
+                    <span><i class="far fa-calendar" style="margin-right: 0.5rem;"></i> <span
+                            th:text="${#dates.format(post.created_at, 'yyyy-MM-dd HH:mm')}">Date</span></span>
+                    <span><i class="far fa-eye" style="margin-right: 0.5rem;"></i> <span
+                            th:text="${post.view_count}">0</span> Views</span>
+                </div>
+            </header>
+
+            <div class="post-view-content" th:utext="${post != null ? post.content : ''}">
+                Content goes here...
+            </div>
+
+            <div
+                style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between;">
+                <button class="btn-primary" style="background: #f1f5f9; color: var(--text-main);">Edit Post</button>
+                <button class="btn-primary" style="background: #fee2e2; color: #991b1b;">Delete</button>
+            </div>
+        </article>
+    </div>
+
+    <footer>
+        <p th:text="${siteSetting.footerCopyright}">© 2024 All rights reserved.</p>
+    </footer>
+</body>
+
+</html>

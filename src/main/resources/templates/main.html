@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Dynamic SEO Meta Tags -->
+    <title th:text="${siteSetting.metaTitle}">CMS PRO - Modern CMS Solution</title>
+    <meta name="description" th:content="${siteSetting.metaDescription}">
+    <meta name="keywords" th:content="${siteSetting.metaKeywords}">
+    <link rel="canonical" th:if="${siteSetting.canonicalUrl != null}" th:href="${siteSetting.canonicalUrl}">
+
+    <!-- Open Graph / SNS -->
+    <meta property="og:type" th:content="${siteSetting.ogType}">
+    <meta property="og:title" th:content="${siteSetting.ogTitle}">
+    <meta property="og:description" th:content="${siteSetting.ogDescription}">
+    <meta property="og:image" th:content="${siteSetting.ogImage}">
+    <meta property="og:site_name" th:content="${siteSetting.siteName}">
+
+    <!-- Google Analytics -->
+    <script async th:if="${siteSetting.googleAnalyticsId != null}"
+        th:src="'https://www.googletagmanager.com/gtag/js?id=' + ${siteSetting.googleAnalyticsId}"></script>
+    <script th:if="${siteSetting.googleAnalyticsId != null}">
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', '[[${siteSetting.googleAnalyticsId}]]');
+    </script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body>
+    <nav class="navbar" id="main-nav">
+        <div class="logo">
+            <img th:if="${siteSetting.logoUrl != null}" th:src="${siteSetting.logoUrl}"
+                th:alt="${siteSetting.logoAltText}" style="height: 40px;">
+            <span th:if="${siteSetting.logoUrl == null}" th:text="${siteSetting.siteName}">CMS PRO</span>
+        </div>
+        <ul class="nav-links">
+            <li th:each="entry : ${groupedMenus}" class="nav-item-dropdown">
+                <!-- If there are submenus, show 1st depth as a label/parent -->
+                <a th:href="${#lists.size(entry.value) == 1 && entry.value[0].main2Depth == null} ? ${entry.value[0].link} : '#'"
+                    th:text="${entry.key}">Parent Menu</a>
+
+                <!-- Submenu list (only if main2Depth exists or there are multiple items) -->
+                <ul class="submenu" th:if="${#lists.size(entry.value) > 1 || (entry.value[0].main2Depth != null)}">
+                    <li th:each="subItem : ${entry.value}" th:if="${subItem.main2Depth != null}">
+                        <a th:href="${subItem.link}" th:text="${subItem.main2Depth}">Sub Item</a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Language Switcher -->
+            <li style="margin-left: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <a th:href="@{${currentUri} (lang='ko')}"
+                    style="font-size: 0.8rem; font-weight: 700; padding: 0;">KO</a>
+                <span style="color: #e2e8f0;">|</span>
+                <a th:href="@{${currentUri} (lang='en')}"
+                    style="font-size: 0.8rem; font-weight: 700; padding: 0;">EN</a>
+            </li>
+        </ul>
+        <div class="nav-actions">
+            <a href="/admin" class="btn-primary" th:text="#{common.dashboard}">Go to Dashboard</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1 th:utext="#{landing.hero.title}">Build Your Digital Experience<br>Faster and Better.</h1>
+            <p th:text="#{landing.hero.desc}">Our industry-leading CMS provides the tools you need to create, manage,
+                and scale your content seamlessly across all platforms.</p>
+            <div class="hero-btns">
+                <a href="/board" class="btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;"
+                    th:text="#{landing.hero.demo}">View Demo</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="features">
+        <div class="feature-card" id="feat-1">
+            <div class="feature-icon"><i class="fas fa-rocket"></i></div>
+            <h3 th:text="#{landing.feat1.title}">Ultra Fast Performance</h3>
+            <p th:text="#{landing.feat1.desc}">Built with modern technology stacks to ensure your site loads instantly
+                for every user.</p>
+        </div>
+        <div class="feature-card" id="feat-2">
+            <div class="feature-icon"><i class="fas fa-layer-group"></i></div>
+            <h3 th:text="#{landing.feat2.title}">Flexible Content Models</h3>
+            <p th:text="#{landing.feat2.desc}">Define your own structure. Create custom fields and relationships that
+                fit your needs exactly.</p>
+        </div>
+        <div class="feature-card" id="feat-3">
+            <div class="feature-icon"><i class="fas fa-shield-halved"></i></div>
+            <h3 th:text="#{landing.feat3.title}">Enterprise Security</h3>
+            <p th:text="#{landing.feat3.desc}">Rest easy with built-in security features, audit logs, and role-based
+                access controls.</p>
+        </div>
+    </section>
+
+    <footer>
+        <p><span th:text="${siteSetting.footerCopyright}">All rights reserved.</span></p>
+    </footer>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+
+</html>

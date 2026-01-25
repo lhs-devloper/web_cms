@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <aside th:fragment="sidebar(activeLink)" class="sidebar">
+        <div class="sidebar-header" th:text="#{common.title}">CMS PRO</div>
+        <nav class="sidebar-nav">
+            <a href="/admin" class="nav-item" th:classappend="${activeLink == 'dashboard' ? 'active' : ''}">
+                <i class="fas fa-chart-line fa-fw"></i>
+                <span th:text="#{common.dashboard}">Dashboard</span>
+            </a>
+
+            <!-- CONTENT Group Dropdown -->
+            <div class="nav-group" th:classappend="${activeLink == 'menu' || activeLink == 'board' ? 'open' : ''}">
+                <div class="nav-group-trigger" onclick="this.parentElement.classList.toggle('open')">
+                    <div class="trigger-info">
+                        <i class="fas fa-folder-open fa-fw"></i>
+                        <span th:text="#{common.content_manage}">CONTENT</span>
+                    </div>
+                    <i class="fas fa-chevron-down chevron"></i>
+                </div>
+                <div class="nav-group-content">
+                    <a href="/admin/menu" class="sub-nav-item" th:classappend="${activeLink == 'menu' ? 'active' : ''}">
+                        <i class="fas fa-sitemap fa-fw" style="font-size: 0.9rem;"></i>
+                        <span th:text="#{common.menu_manage}">Menus</span>
+                    </a>
+                    <a href="/admin/board" class="sub-nav-item"
+                        th:classappend="${activeLink == 'board' ? 'active' : ''}">
+                        <i class="fas fa-file-alt fa-fw" style="font-size: 0.9rem;"></i>
+                        <span th:text="#{board.title}">Boards</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- SYSTEM Group Dropdown -->
+            <div class="nav-group" th:classappend="${activeLink == 'setting' ? 'open' : ''}">
+                <div class="nav-group-trigger" onclick="this.parentElement.classList.toggle('open')">
+                    <div class="trigger-info">
+                        <i class="fas fa-cog fa-fw"></i>
+                        <span>SYSTEM</span>
+                    </div>
+                    <i class="fas fa-chevron-down chevron"></i>
+                </div>
+                <div class="nav-group-content">
+                    <div class="sub-nav-item">
+                        <i class="fas fa-users" style="font-size: 0.9rem;"></i>
+                        Users
+                    </div>
+                    <a href="/admin/setting" class="sub-nav-item"
+                        th:classappend="${activeLink == 'setting' ? 'active' : ''}">
+                        <i class="fas fa-tools" style="font-size: 0.9rem;"></i>
+                        <span th:text="#{common.settings}">Settings</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Language Switcher -->
+        <div style="padding: 1rem 2rem; border-top: 1px solid #334155; display: flex; gap: 1rem; font-size: 0.8rem;">
+            <a th:href="@{${currentUri} (lang='ko')}"
+                style="color: var(--sidebar-text); text-decoration: none; font-weight: 600;">KO</a>
+            <span style="color: #475569;">|</span>
+            <a th:href="@{${currentUri} (lang='en')}"
+                style="color: var(--sidebar-text); text-decoration: none; font-weight: 600;">EN</a>
+        </div>
+
+        <div style="padding: 1.5rem 2rem; border-top: 1px solid #334155;">
+            <a href="/"
+                style="color: var(--sidebar-text); font-size: 0.9rem; text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-external-link-alt"></i> <span th:text="#{common.view.site}">View Site</span>
+            </a>
+        </div>
+    </aside>
+</body>
+
+</html>
