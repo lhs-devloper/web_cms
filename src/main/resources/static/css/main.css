@@ -66,6 +66,12 @@ body {
     color: var(--primary);
 }
 
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
 /* 2-Depth Submenu */
 .submenu {
     position: absolute;
@@ -254,6 +260,13 @@ body {
     font-size: 1.1rem;
     color: #334155;
     line-height: 1.8;
+}
+
+.post-view-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
 }
 
 footer {

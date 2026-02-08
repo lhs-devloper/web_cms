@@ -78,7 +78,20 @@
 
             <div class="form-group">
                 <label class="form-label">Author Name</label>
-                <input type="text" name="author" class="form-input" placeholder="Your name" required>
+                <!-- Logged In -->
+                <input th:if="${user != null}" type="text" name="author" class="form-input" th:value="${user.name}"
+                    readonly style="background: #f1f5f9; cursor: not-allowed;">
+
+                <!-- Not Logged In -->
+                <input th:if="${user == null}" type="text" name="author" class="form-input" placeholder="Your name"
+                    required>
+            </div>
+
+            <!-- Password only for Guest -->
+            <div class="form-group" th:if="${user == null}">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-input" placeholder="Password (for editing/deleting)"
+                    required>
             </div>
 
             <div class="form-group">

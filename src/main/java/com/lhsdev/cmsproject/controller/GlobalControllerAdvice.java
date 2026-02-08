@@ -29,12 +29,22 @@ public class GlobalControllerAdvice {
         model.addAttribute("currentUri", request.getRequestURI());
 
         // Group menus by 1st depth for 2-depth rendering
-        // Use LinkedHashMap to preserve order of Main1Depth if wanted
         List<Menu> allMenus = menuRepository.findAllByOrderBySortOrderAscMain1DepthAscMain2DepthAsc();
         Map<String, List<Menu>> groupedMenus = allMenus.stream()
                 .collect(Collectors.groupingBy(Menu::getMain1Depth, LinkedHashMap::new, Collectors.toList()));
 
         model.addAttribute("allMenus", allMenus);
         model.addAttribute("groupedMenus", groupedMenus);
+
+        // Setup User for Header
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()
+                && !(auth instanceof org.springframework.security.authentication.AnonymousAuthenticationToken)) {
+            Object principal = auth.getPrincipal();
+            if (principal instanceof com.lhsdev.cmsproject.config.auth.PrincipalDetails) {
+                model.addAttribute("user", ((com.lhsdev.cmsproject.config.auth.PrincipalDetails) principal).getUser());
+            }
+        }
     }
 }

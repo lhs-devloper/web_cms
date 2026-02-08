@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics - CMS PRO</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <aside th:replace="~{admin/fragments/sidebar :: sidebar('stats')}"></aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div class="search-bar">
+                <i class="fas fa-chart-pie" style="margin-right: 0.5rem;"></i>
+                <span>Visitor Statistics</span>
+            </div>
+            <div class="user-profile" style="display: flex; align-items: center; gap: 1rem;">
+                <div
+                    style="width: 40px; height: 40px; background: #6366f1; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                    AD
+                </div>
+                <span style="font-weight: 600; color: #1e293b;">Administrator</span>
+            </div>
+        </header>
+
+        <main class="content-body">
+            <h2 style="margin-bottom: 2rem; font-weight: 800; font-size: 1.75rem; letter-spacing: -0.025em;">
+                Visitor Analytics
+            </h2>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid" style="margin-bottom: 2rem;">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Today's Visitors</div>
+                        <div class="stat-icon icon-blue">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                    </div>
+                    <div class="stat-number" th:text="${#numbers.formatInteger(todayCount, 0, 'COMMA')}">0</div>
+                    <div class="stat-change trend-neutral">
+                        <span>Unique Visitors (Session)</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Total Visitors</div>
+                        <div class="stat-icon icon-purple">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="stat-number" th:text="${#numbers.formatInteger(totalCount, 0, 'COMMA')}">0</div>
+                    <div class="stat-change trend-up">
+                        <span>Cumulative</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="data-section" style="padding: 2rem;">
+                <h3 style="margin-bottom: 1.5rem; font-weight: 700;">Daily Visitors (Last 30 Days)</h3>
+                <div style="height: 400px; width: 100%;">
+                    <canvas id="visitorChart"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const labels = /*[[${visitorLabels}]]*/[];
+        const data = /*[[${visitorData}]]*/[];
+
+        // Parse labels back to array (Thymeleaf might output [ "a", "b" ] string)
+        // If passed as List<String>, Thymeleaf outputs JSON array automatically if outputting simply.
+        // Actually, th:inline="javascript" handles JSON serialization for List/Objects well.
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('visitorChart').getContext('2d');
+
+            // Create gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(99, 102, 241, 0.5)');   // Primary color
+            gradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Visitors',
+                        data: data,
+                        borderColor: '#6366f1',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#6366f1',
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#e2e8f0',
+                            padding: 10,
+                            cornerRadius: 8,
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#f1f5f9'
+                            },
+                            ticks: {
+                                font: {
+                                    family: "'Inter', sans-serif"
+                                },
+                                color: '#64748b'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: "'Inter', sans-serif"
+                                },
+                                color: '#64748b',
+                                maxTicksLimit: 10
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+        });
+        /*]]>*/
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <nav th:fragment="header(activeLink)" class="navbar" id="main-nav">
+        <div class="logo">
+            <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center;">
+                <img th:if="${siteSetting.logoUrl != null}" th:src="${siteSetting.logoUrl}"
+                    th:alt="${siteSetting.logoAltText}" style="height: 40px;">
+                <span th:if="${siteSetting.logoUrl == null}" th:text="${siteSetting.siteName}">CMS PRO</span>
+            </a>
+        </div>
+        <ul class="nav-links">
+            <li class="nav-item">
+                <a href="/products" th:classappend="${activeLink == 'shop' ? 'active' : ''}">SHOP</a>
+            </li>
+            <li th:each="entry : ${groupedMenus}" class="nav-item-dropdown">
+                <!-- If there are submenus, show 1st depth as a label/parent -->
+                <a th:href="${#lists.size(entry.value) == 1 && entry.value[0].main2Depth == null} ? ${entry.value[0].link} : '#'"
+                    th:text="${entry.key}">Parent Menu</a>
+
+                <!-- Submenu list (only if main2Depth exists or there are multiple items) -->
+                <ul class="submenu" th:if="${#lists.size(entry.value) > 1 || (entry.value[0].main2Depth != null)}">
+                    <li th:each="subItem : ${entry.value}" th:if="${subItem.main2Depth != null}">
+                        <a th:href="${subItem.link}" th:text="${subItem.main2Depth}">Sub Item</a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Language Switcher -->
+            <li style="margin-left: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <!-- We need currentUri handling properly in all controllers or just use query params if possible -->
+                <!-- Assuming currentUri is passed or we can default to / -->
+                <a th:href="@{${currentUri != null ? currentUri : '/'} (lang='ko')}"
+                    style="font-size: 0.8rem; font-weight: 700; padding: 0;">KO</a>
+                <span style="color: #e2e8f0;">|</span>
+                <a th:href="@{${currentUri != null ? currentUri : '/'} (lang='en')}"
+                    style="font-size: 0.8rem; font-weight: 700; padding: 0;">EN</a>
+            </li>
+        </ul>
+        <div class="nav-actions">
+            <!-- Admin Link -->
+            <a href="/admin" class="btn-primary" style="margin-right: 1rem;" th:text="#{common.dashboard}">Dashboard</a>
+
+            <!-- User Info / Login -->
+            <div th:if="${user != null}" style="display: flex; align-items: center; gap: 1rem;">
+                <a href="/profile"
+                    style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #1e293b; font-weight: 600;">
+                    <div
+                        style="width: 28px; height: 28px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                        <img th:if="${user.picture != null}" th:src="${user.picture}"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                        <i th:if="${user.picture == null}" class="fas fa-user"
+                            style="font-size: 0.7rem; color: #64748b;"></i>
+                    </div>
+                    <span th:text="${user.name}">User</span>
+                </a>
+                <a href="/logout" style="font-size: 0.9rem; color: #64748b; text-decoration: none;">Logout</a>
+            </div>
+            <a th:unless="${user != null}" href="/login" class="btn-primary">Login</a>
+        </div>
+    </nav>
+</body>
+
+</html>

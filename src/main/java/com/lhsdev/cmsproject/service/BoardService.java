@@ -122,12 +122,14 @@ public class BoardService {
     }
 
     @Transactional
-    public void savePost(String boardId, String title, String content, String author, String ip) {
+    public void savePost(String boardId, String title, String content, String author, String authorId, String password,
+            String ip) {
         BoardMeta meta = boardMetaRepository.findByBoardId(boardId)
                 .orElseThrow(() -> new RuntimeException("게시판을 찾을 수 없습니다."));
 
-        String sql = "INSERT INTO " + meta.getTableName() + " (title, content, author, ip_address) VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(sql, title, content, author, ip);
+        String sql = "INSERT INTO " + meta.getTableName()
+                + " (title, content, author, author_id, password, ip_address) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, title, content, author, authorId, password, ip);
     }
 
     @Transactional(readOnly = true)

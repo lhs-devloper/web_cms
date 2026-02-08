@@ -30,9 +30,17 @@ public class AdminController {
     @Autowired
     private MenuRepository menuRepository;
 
+    private final com.lhsdev.cmsproject.service.VisitorService visitorService;
+
     @GetMapping({ "", "/" })
     public String main(Model model) {
         model.addAttribute("activeSessionCount", SessionListener.getActiveSessions());
+        // For Active Users (Sessions), we might prefer real-time session count from
+        // listener.
+        // For Visits (Traffic), we use the database service.
+        model.addAttribute("todayVisitorCount", visitorService.getTodayVisitorCount());
+        model.addAttribute("totalVisitorCount", visitorService.getTotalVisitorCount());
+
         model.addAttribute("latestPosts", boardService.getLatestPostsFromCheckedBoards());
         return "admin/main";
     }

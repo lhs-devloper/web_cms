@@ -45,26 +45,26 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-label" th:text="#{admin.stats.users}">Total Users</div>
+                        <div class="stat-label">Today's Visitors</div>
                         <div class="stat-icon icon-blue">
-                            <i class="fas fa-users"></i>
+                            <i class="fas fa-user-clock"></i>
                         </div>
                     </div>
-                    <div class="stat-number">1,284</div>
-                    <div class="stat-change trend-up">
-                        <i class="fas fa-arrow-up"></i> 12% <span>vs last month</span>
+                    <div class="stat-number" th:text="${#numbers.formatInteger(todayVisitorCount, 0, 'COMMA')}">0</div>
+                    <div class="stat-change trend-neutral">
+                        <span>Unique Visitors (Session)</span>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-label" th:text="#{admin.stats.views}">Total Views</div>
+                        <div class="stat-label">Total Visitors</div>
                         <div class="stat-icon icon-purple">
-                            <i class="fas fa-eye"></i>
+                            <i class="fas fa-users"></i>
                         </div>
                     </div>
-                    <div class="stat-number">48.5K</div>
+                    <div class="stat-number" th:text="${#numbers.formatInteger(totalVisitorCount, 0, 'COMMA')}">0</div>
                     <div class="stat-change trend-up">
-                        <i class="fas fa-arrow-up"></i> 8.2% <span>vs last week</span>
+                        <span>Cumulative</span>
                     </div>
                 </div>
                 <div class="stat-card">

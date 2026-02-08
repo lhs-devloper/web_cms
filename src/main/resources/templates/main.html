@@ -39,41 +39,38 @@
 </head>
 
 <body>
-    <nav class="navbar" id="main-nav">
-        <div class="logo">
-            <img th:if="${siteSetting.logoUrl != null}" th:src="${siteSetting.logoUrl}"
-                th:alt="${siteSetting.logoAltText}" style="height: 40px;">
-            <span th:if="${siteSetting.logoUrl == null}" th:text="${siteSetting.siteName}">CMS PRO</span>
+    <nav th:replace="~{fragments/header :: header('home')}"></nav>
+
+    <!-- Dynamic Banner Slider -->
+    <header class="hero" th:if="${banners != null and !banners.isEmpty()}" id="hero-slider"
+        style="position: relative; overflow: hidden; padding: 0; height: 60vh; min-height: 400px;">
+        <div th:each="banner, stat : ${banners}" class="hero-slide"
+            th:style="'background-image: url(\'' + ${banner.imageUrl} + '\'); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: opacity 1s ease-in-out; opacity: ' + (${stat.first} ? '1' : '0') + '; z-index: ' + (${stat.first} ? '1' : '0')">
+            <div class="hero-content"
+                style="position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: rgba(0,0,0,0.4); padding: 2rem;">
+                <h1 th:text="${banner.title}"
+                    style="color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); margin-bottom: 1rem;">Title</h1>
+                <p th:text="${banner.description}"
+                    style="color: #f1f5f9; text-shadow: 0 1px 2px rgba(0,0,0,0.5); font-size: 1.25rem; max-width: 800px; margin-bottom: 2rem;">
+                    Desc</p>
+                <div class="hero-btns" th:if="${banner.linkUrl != null and !banner.linkUrl.isEmpty()}">
+                    <a th:href="${banner.linkUrl}" class="btn-primary"
+                        style="padding: 1rem 2rem; font-size: 1.1rem; border: none;">View More</a>
+                </div>
+            </div>
         </div>
-        <ul class="nav-links">
-            <li th:each="entry : ${groupedMenus}" class="nav-item-dropdown">
-                <!-- If there are submenus, show 1st depth as a label/parent -->
-                <a th:href="${#lists.size(entry.value) == 1 && entry.value[0].main2Depth == null} ? ${entry.value[0].link} : '#'"
-                    th:text="${entry.key}">Parent Menu</a>
 
-                <!-- Submenu list (only if main2Depth exists or there are multiple items) -->
-                <ul class="submenu" th:if="${#lists.size(entry.value) > 1 || (entry.value[0].main2Depth != null)}">
-                    <li th:each="subItem : ${entry.value}" th:if="${subItem.main2Depth != null}">
-                        <a th:href="${subItem.link}" th:text="${subItem.main2Depth}">Sub Item</a>
-                    </li>
-                </ul>
-            </li>
-
-            <!-- Language Switcher -->
-            <li style="margin-left: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                <a th:href="@{${currentUri} (lang='ko')}"
-                    style="font-size: 0.8rem; font-weight: 700; padding: 0;">KO</a>
-                <span style="color: #e2e8f0;">|</span>
-                <a th:href="@{${currentUri} (lang='en')}"
-                    style="font-size: 0.8rem; font-weight: 700; padding: 0;">EN</a>
-            </li>
-        </ul>
-        <div class="nav-actions">
-            <a href="/admin" class="btn-primary" th:text="#{common.dashboard}">Go to Dashboard</a>
+        <div
+            style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; gap: 12px;">
+            <span th:each="banner, stat : ${banners}" class="slider-dot" th:onclick="'showSlide(' + ${stat.index} + ')'"
+                style="width: 12px; height: 12px; border-radius: 50%; background: white; opacity: 0.5; cursor: pointer; transition: all 0.3s;"
+                th:styleappend="${stat.first} ? 'opacity: 1; transform: scale(1.2);'"></span>
         </div>
-    </nav>
+    </header>
 
-    <header class="hero">
+    <!-- Fallback Static Hero -->
+    <header class="hero" th:if="${banners == null or banners.isEmpty()}">
+        <!-- Debug: Banners is empty or null -->
         <div class="hero-content">
             <h1 th:utext="#{landing.hero.title}">Build Your Digital Experience<br>Faster and Better.</h1>
             <p th:text="#{landing.hero.desc}">Our industry-leading CMS provides the tools you need to create, manage,
@@ -111,6 +108,40 @@
     </footer>
 
     <script th:src="@{/js/main.js}"></script>
+    <script th:if="${banners != null and !banners.isEmpty()}">
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.hero-slide');
+        const dots = document.querySelectorAll('.slider-dot');
+        const totalSlides = slides.length;
+
+        function showSlide(index) {
+            if (index >= totalSlides) index = 0;
+            if (index < 0) index = totalSlides - 1;
+
+            slides.forEach(slide => {
+                slide.style.opacity = '0';
+                slide.style.zIndex = '0';
+            });
+            dots.forEach(dot => {
+                dot.style.opacity = '0.5';
+                dot.style.transform = 'scale(1)';
+            });
+
+            slides[index].style.opacity = '1';
+            slides[index].style.zIndex = '1';
+            dots[index].style.opacity = '1';
+            dots[index].style.transform = 'scale(1.2)';
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        if (totalSlides > 1) {
+            setInterval(nextSlide, 5000);
+        }
+    </script>
 </body>
 
 </html>

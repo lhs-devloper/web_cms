@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 - CMS Project</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-color: #F9FAFB;
+            --card-bg: #FFFFFF;
+            --text-color: #1F2937;
+            --text-muted: #6B7280;
+            --border-color: #E5E7EB;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0 0 0.5rem 0;
+        }
+
+        .login-header p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-color);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .divider span {
+            padding: 0 0.75rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .social-login {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .btn-social {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background-color: white;
+            color: var(--text-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            box-sizing: border-box;
+        }
+
+        .btn-social:hover {
+            background-color: #F3F4F6;
+        }
+
+        /* Social Login Buttons - Brand Colors */
+        .btn-social.btn-google {
+            background-color: #ffffff;
+            color: #1f1f1f;
+            border: 1px solid #747775;
+        }
+
+        .btn-social.btn-google:hover {
+            background-color: #f0f4fd;
+            border-color: #747775;
+        }
+
+        .btn-social.btn-naver {
+            background-color: #03C75A;
+            color: #ffffff;
+            border: 1px solid #03C75A;
+        }
+
+        .btn-social.btn-naver:hover {
+            background-color: #02b351;
+        }
+
+        .btn-social.btn-kakao {
+            background-color: #FEE500;
+            color: #191919;
+            border: 1px solid #FEE500;
+            border-radius: 12px;
+        }
+
+        .btn-social.btn-kakao:hover {
+            background-color: #e6cf00;
+        }
+
+        .btn-social.btn-github {
+            background-color: #181717;
+            color: #ffffff;
+            border: 1px solid #181717;
+        }
+
+        .btn-social.btn-github:hover {
+            background-color: #333333;
+        }
+
+        .btn-social.btn-apple {
+            background-color: #000000;
+            color: #ffffff;
+            border: 1px solid #000000;
+        }
+
+        .btn-social.btn-apple:hover {
+            background-color: #333333;
+        }
+
+        .btn-social svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.5rem;
+            fill: currentColor;
+            /* Matches text color */
+        }
+
+        /* ... */
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>로그인</h1>
+            <p>서비스 이용을 위해 로그인해주세요.</p>
+        </div>
+
+        <div th:if="${param.error}" class="error-message">
+            아이디 또는 비밀번호가 올바르지 않습니다.
+        </div>
+
+        <!-- General Login -->
+        <form action="/loginProc" method="post">
+            <div class="form-group">
+                <label for="username" class="form-label">이메일</label>
+                <input type="email" id="username" name="username" class="form-input" placeholder="example@email.com"
+                    required>
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">비밀번호</label>
+                <input type="password" id="password" name="password" class="form-input" placeholder="비밀번호를 입력하세요"
+                    required>
+            </div>
+            <button type="submit" class="btn-primary">로그인</button>
+            <div style="text-align: center; margin-top: 1rem; font-size: 0.875rem;">
+                계정이 없으신가요? <a href="/signup"
+                    style="color: var(--primary-color); text-decoration: none; font-weight: 500;">회원가입</a>
+            </div>
+        </form>
+
+        <div class="divider" th:if="${!activeProviders.isEmpty()}">
+            <span>또는 소셜 로그인</span>
+        </div>
+
+        <!-- Social Login -->
+        <div class="social-login" th:if="${!activeProviders.isEmpty()}">
+            <a href="/oauth2/authorization/google" class="btn-social btn-google"
+                th:if="${#lists.contains(activeProviders, 'google')}">
+                <svg role="img" viewBox="12 10 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <title>Google</title>
+                    <path
+                        d="M31.6 20.2273C31.6 19.5182 31.5364 18.8364 31.4182 18.1818H22V22.05H27.3818C27.15 23.3 26.4455 24.3591 25.3864 25.0682V27.5773H28.6182C30.5091 25.8364 31.6 23.2727 31.6 20.2273Z"
+                        fill="#4285F4" />
+                    <path
+                        d="M22 30C24.7 30 26.9636 29.1045 28.6181 27.5773L25.3863 25.0682C24.4909 25.6682 23.3454 26.0227 22 26.0227C19.3954 26.0227 17.1909 24.2636 16.4045 21.9H13.0636V24.4909C14.7091 27.7591 18.0909 30 22 30Z"
+                        fill="#34A853" />
+                    <path
+                        d="M16.4045 21.9C16.2045 21.3 16.0909 20.6591 16.0909 20C16.0909 19.3409 16.2045 18.7 16.4045 18.1V15.5091H13.0636C12.3864 16.8591 12 18.3864 12 20C12 21.6136 12.3864 23.1409 13.0636 24.4909L16.4045 21.9Z"
+                        fill="#FBBC04" />
+                    <path
+                        d="M22 13.9773C23.4681 13.9773 24.7863 14.4818 25.8227 15.4727L28.6909 12.6045C26.9591 10.9909 24.6954 10 22 10C18.0909 10 14.7091 12.2409 13.0636 15.5091L16.4045 18.1C17.1909 15.7364 19.3954 13.9773 22 13.9773Z"
+                        fill="#E94235" />
+                </svg>
+                Google 로그인
+            </a>
+            <a href="/oauth2/authorization/naver" class="btn-social btn-naver"
+                th:if="${#lists.contains(activeProviders, 'naver')}">
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <title>Naver</title>
+                    <path d="M16.273 12.845 7.376 0H0v24h7.726V11.156L16.624 24H24V0h-7.727v12.845Z" />
+                </svg>
+                네이버 로그인
+            </a>
+            <a href="/oauth2/authorization/kakao" class="btn-social btn-kakao"
+                th:if="${#lists.contains(activeProviders, 'kakao')}">
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="fill: #000000;">
+                    <title>Kakao</title>
+                    <path
+                        d="M12 3C5.925 3 1 6.925 1 11.775C1 14.75 2.875 17.375 5.725 18.9L4.575 23.1L8.725 20.35C9.775 20.675 10.875 20.85 12 20.85C18.075 20.85 23 16.925 23 12.075C23 6.925 18.075 3 12 3Z" />
+                </svg>
+                카카오 로그인
+            </a>
+            <a href="/oauth2/authorization/github" class="btn-social btn-github"
+                th:if="${#lists.contains(activeProviders, 'github')}">
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <title>GitHub</title>
+                    <path
+                        d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+                </svg>
+                GitHub 로그인
+            </a>
+            <a href="/oauth2/authorization/apple" class="btn-social btn-apple"
+                th:if="${#lists.contains(activeProviders, 'apple')}">
+                <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <title>Apple</title>
+                    <path
+                        d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
+                </svg>
+                Apple 로그인
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

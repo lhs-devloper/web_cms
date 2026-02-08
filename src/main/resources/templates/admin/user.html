@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Management - CMS PRO</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+
+<body>
+    <aside th:replace="~{admin/fragments/sidebar :: sidebar('user')}"></aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div class="search-bar">
+                <i class="fas fa-search" style="margin-right: 0.5rem;"></i>
+                <span>Search members...</span>
+            </div>
+            <div class="user-profile" style="display: flex; align-items: center; gap: 1rem;">
+                <div
+                    style="width: 40px; height: 40px; background: #6366f1; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                    AD
+                </div>
+                <span style="font-weight: 600; color: #1e293b;">Administrator</span>
+            </div>
+        </header>
+
+        <main class="content-body">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div>
+                    <h2 style="font-weight: 800; font-size: 1.75rem; letter-spacing: -0.025em; color: #1e293b;">Member
+                        Management</h2>
+                    <p style="color: #64748b; margin-top: 0.5rem;">Manage registered users and their roles.</p>
+                </div>
+            </div>
+
+            <!-- Search Form -->
+            <div
+                style="background: white; padding: 1.5rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; margin-bottom: 2rem;">
+                <div style="display: flex; gap: 1rem;">
+                    <div style="flex: 1; position: relative;">
+                        <i class="fas fa-search"
+                            style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                        <input type="text" name="keyword" th:value="${keyword}" placeholder="Search by name..."
+                            oninput="searchUsers()"
+                            style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; outline: none;">
+                    </div>
+
+                    <select name="role" onchange="searchUsers()"
+                        style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; min-width: 150px; outline: none; background: white;">
+                        <option value="">All Roles</option>
+                        <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"
+                            th:selected="${selectedRole == r}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Alerts -->
+            <div th:if="${message}"
+                style="background: #dcfce7; color: #166534; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; border: 1px solid #bbf7d0;">
+                <i class="fas fa-check-circle"></i> <span th:text="${message}"></span>
+            </div>
+            <div th:if="${error}"
+                style="background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; border: 1px solid #fecaca;">
+                <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
+
+            <div class="data-section">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border);">
+                            <th style="text-align: left; padding: 1.25rem 1rem;">ID</th>
+                            <th style="padding: 1.25rem 1rem; text-align: left;">Name</th>
+                            <th style="padding: 1.25rem 1rem; text-align: left;">Email</th>
+                            <th style="text-align: left; padding: 1.25rem 1rem;">Provider</th>
+                            <th style="text-align: left; padding: 1.25rem 1rem;">Role</th>
+                            <th style="text-align: right; padding: 1.25rem 1rem;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr th:each="u : ${users}" style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 1.25rem 1rem; color: #64748b;" th:text="${u.id}">1</td>
+                            <td style="padding: 1.25rem 1rem; font-weight: 600; color: #1e293b;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <img th:if="${u.picture != null}" th:src="${u.picture}"
+                                        style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                                    <div th:if="${u.picture == null}"
+                                        style="width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #64748b;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <span th:text="${u.name}">User Name</span>
+                                </div>
+                            </td>
+                            <td style="padding: 1.25rem 1rem; color: #64748b;" th:text="${u.email}">user@example.com
+                            </td>
+                            <td style="padding: 1.25rem 1rem;">
+                                <span class="badge" th:text="${u.provider}"
+                                    style="background: #f1f5f9; color: #475569; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 600;">LOCAL</span>
+                            </td>
+                            <td style="padding: 1.25rem 1rem;">
+                                <form th:action="@{/admin/user/update-role}" method="POST"
+                                    style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="hidden" name="id" th:value="${u.id}">
+                                    <select name="role" onchange="this.form.submit()"
+                                        style="padding: 0.25rem 0.5rem; border-radius: 0.25rem; border: 1px solid #cbd5e1; font-size: 0.85rem; cursor: pointer;"
+                                        th:styleappend="${u.role.name() == 'ADMIN' ? 'background: #fee2e2; color: #991b1b; border-color: #fca5a5;' : 'background: #dcfce7; color: #166534; border-color: #86efac;'}">
+                                        <option value="USER" th:selected="${u.role.name() == 'USER'}">USER</option>
+                                        <option value="ADMIN" th:selected="${u.role.name() == 'ADMIN'}">ADMIN</option>
+                                    </select>
+                                </form>
+                            </td>
+                            <td style="padding: 1.25rem 1rem; text-align: right;">
+                                <form th:action="@{/admin/user/delete}" method="POST"
+                                    onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');"
+                                    style="display: inline;">
+                                    <input type="hidden" name="id" th:value="${u.id}">
+                                    <button type="submit"
+                                        style="background: none; border: none; padding: 0; color: #94a3b8; cursor: pointer; transition: color 0.2s;"
+                                        onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'"
+                                        title="Delete User">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(users)}">
+                            <td colspan="6" style="padding: 4rem; text-align: center; color: #94a3b8;">
+                                <i class="fas fa-users"
+                                    style="font-size: 2.5rem; margin-bottom: 1rem; display: block;"></i>
+                                <span>No users found.</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+    <script>
+        let searchTimeout;
+        function searchUsers() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const keywordElement = document.querySelector('input[name="keyword"]');
+                const roleElement = document.querySelector('select[name="role"]');
+
+                if (!keywordElement || !roleElement) return;
+
+                const keyword = keywordElement.value;
+                const role = roleElement.value;
+
+                fetch(`/api/admin/user/search?keyword=${encodeURIComponent(keyword)}&role=${encodeURIComponent(role)}`)
+                    .then(response => response.json())
+                    .then(users => {
+                        const tbody = document.getElementById('userTableBody');
+                        if (!tbody) return;
+                        tbody.innerHTML = '';
+
+                        if (users.length === 0) {
+                            tbody.innerHTML = `
+                                <tr>
+                                    <td colspan="6" style="padding: 4rem; text-align: center; color: #94a3b8;">
+                                        <i class="fas fa-users" style="font-size: 2.5rem; margin-bottom: 1rem; display: block;"></i>
+                                        <span>No users found.</span>
+                                    </td>
+                                </tr>`;
+                            return;
+                        }
+
+                        users.forEach(u => {
+                            const tr = document.createElement('tr');
+                            tr.style.borderBottom = '1px solid var(--border)';
+
+                            const roleStyle = u.role === 'ADMIN'
+                                ? 'background: #fee2e2; color: #991b1b; border-color: #fca5a5;'
+                                : 'background: #dcfce7; color: #166534; border-color: #86efac;';
+
+                            const pictureHtml = u.picture
+                                ? `<img src="${u.picture}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">`
+                                : `<div style="width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #64748b;"><i class="fas fa-user"></i></div>`;
+
+                            const provider = u.provider ? u.provider : 'LOCAL';
+
+                            tr.innerHTML = `
+                                <td style="padding: 1.25rem 1rem; color: #64748b;">${u.id}</td>
+                                <td style="padding: 1.25rem 1rem; font-weight: 600; color: #1e293b;">
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        ${pictureHtml}
+                                        <span>${u.name}</span>
+                                    </div>
+                                </td>
+                                <td style="padding: 1.25rem 1rem; color: #64748b;">${u.email}</td>
+                                <td style="padding: 1.25rem 1rem;">
+                                    <span class="badge" style="background: #f1f5f9; color: #475569; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 600;">${provider}</span>
+                                </td>
+                                <td style="padding: 1.25rem 1rem;">
+                                    <form action="/admin/user/update-role" method="POST" style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="hidden" name="id" value="${u.id}">
+                                        <select name="role" onchange="this.form.submit()" 
+                                                style="padding: 0.25rem 0.5rem; border-radius: 0.25rem; border: 1px solid #cbd5e1; font-size: 0.85rem; cursor: pointer; ${roleStyle}">
+                                            <option value="USER" ${u.role === 'USER' ? 'selected' : ''}>USER</option>
+                                            <option value="ADMIN" ${u.role === 'ADMIN' ? 'selected' : ''}>ADMIN</option>
+                                        </select>
+                                    </form>
+                                </td>
+                                <td style="padding: 1.25rem 1rem; text-align: right;">
+                                    <form action="/admin/user/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');" style="display: inline;">
+                                        <input type="hidden" name="id" value="${u.id}">
+                                        <button type="submit" style="background: none; border: none; padding: 0; color: #94a3b8; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'" title="Delete User">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            }, 300);
+        }
+    </script>
+</body>
+
+</html>

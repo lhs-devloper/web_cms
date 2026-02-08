@@ -13,18 +13,7 @@
 </head>
 
 <body>
-    <nav class="navbar">
-        <div class="logo">
-            <a href="/" style="text-decoration: none; color: inherit;" th:text="${siteSetting.siteName}">CMS PRO</a>
-        </div>
-        <ul class="nav-links">
-            <li><a href="/" th:text="#{common.home}">Home</a></li>
-            <li><a th:href="@{/board/{id}(id=${board.boardId})}" th:text="${board.boardId}">Board</a></li>
-        </ul>
-        <div class="nav-actions">
-            <a href="/admin" class="btn-primary" th:text="#{common.dashboard}">Dashboard</a>
-        </div>
-    </nav>
+    <nav th:replace="~{fragments/header :: header('board')}"></nav>
 
     <div class="container" style="max-width: 800px;">
         <div style="margin-bottom: 2rem;">
@@ -57,8 +46,88 @@
                 <button class="btn-primary" style="background: #f1f5f9; color: var(--text-main);">Edit Post</button>
                 <button class="btn-primary" style="background: #fee2e2; color: #991b1b;">Delete</button>
             </div>
+
+            <!-- Comment Section -->
+            <div class="comments-section" style="margin-top: 4rem;">
+                <h3 style="font-weight: 700; margin-bottom: 2rem;">Comments <span
+                        style="color: #64748b; font-weight: 500; font-size: 1rem;"
+                        th:text="'(' + ${#lists.size(comments)} + ')'"></span></h3>
+
+                <!-- List -->
+                <div class="comment-list" style="margin-bottom: 3rem;">
+                    <div th:each="comment : ${comments}"
+                        style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #f1f5f9; display: flex; gap: 1rem;">
+                        <div style="width: 40px; height: 40px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #64748b; flex-shrink: 0;"
+                            th:text="${#strings.substring(comment.author, 0, 1)}">A</div>
+                        <div style="flex: 1;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                <div>
+                                    <strong th:text="${comment.author}"
+                                        style="margin-right: 0.5rem; color: #1e293b;">Author</strong>
+                                    <span style="font-size: 0.8rem; color: #94a3b8;"
+                                        th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">Date</span>
+                                </div>
+                                <button onclick="toggleDelete(this)"
+                                    style="background: none; border: none; font-size: 0.8rem; color: #94a3b8; cursor: pointer;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <p style="margin: 0; color: #475569; line-height: 1.5;" th:text="${comment.content}">Content
+                            </p>
+
+                            <!-- Delete Form Overlay -->
+                            <form th:action="@{/board/{boardId}/comment/delete(boardId=${board.boardId})}" method="POST"
+                                style="display: none; margin-top: 0.5rem; align-items: center; gap: 0.5rem;"
+                                class="delete-form">
+                                <input type="hidden" name="postId" th:value="${post.id}">
+                                <input type="hidden" name="commentId" th:value="${comment.id}">
+                                <input type="password" name="password" placeholder="Password"
+                                    style="padding: 0.25rem 0.5rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.8rem;"
+                                    required>
+                                <button type="submit"
+                                    style="background: #ef4444; color: white; border: none; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div th:if="${#lists.isEmpty(comments)}" style="text-align: center; color: #94a3b8; padding: 2rem;">
+                        No comments yet. Be the first to write one!
+                    </div>
+                </div>
+
+                <!-- Write Form -->
+                <div class="comment-form" style="background: #f8fafc; padding: 2rem; border-radius: 1rem;">
+                    <h4 style="margin-top: 0; margin-bottom: 1.5rem; font-weight: 600;">Leave a Comment</h4>
+                    <form th:action="@{/board/{boardId}/comment/save(boardId=${board.boardId})}" method="POST">
+                        <input type="hidden" name="postId" th:value="${post.id}">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <!-- Logged In -->
+                            <input th:if="${user != null}" type="text" name="author" th:value="${user.name}" readonly
+                                style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; background: #f1f5f9; cursor: not-allowed; grid-column: span 2;">
+
+                            <!-- Not Logged In -->
+                            <input th:if="${user == null}" type="text" name="author" placeholder="Name"
+                                style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem;" required>
+                            <input th:if="${user == null}" type="password" name="password"
+                                placeholder="Password (for deletion)"
+                                style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem;" required>
+                        </div>
+                        <textarea name="content" rows="3" placeholder="Write your comment..."
+                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; margin-bottom: 1rem; font-family: inherit; resize: vertical;"
+                            required></textarea>
+                        <button type="submit" class="btn-primary" style="width: auto; padding: 0.75rem 2rem;">Post
+                            Comment</button>
+                    </form>
+                </div>
+            </div>
         </article>
     </div>
+
+    <script>
+        function toggleDelete(btn) {
+            const form = btn.parentElement.parentElement.querySelector('.delete-form');
+            form.style.display = form.style.display === 'none' || form.style.display === '' ? 'flex' : 'none';
+        }
+    </script>
 
     <footer>
         <p th:text="${siteSetting.footerCopyright}">© 2024 All rights reserved.</p>

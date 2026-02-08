@@ -14,19 +14,7 @@
 </head>
 
 <body>
-    <nav class="navbar">
-        <div class="logo">
-            <a href="/" style="text-decoration: none; color: inherit;" th:text="${siteSetting.siteName}">CMS PRO</a>
-        </div>
-        <ul class="nav-links">
-            <li><a href="/" th:text="#{common.home}">Home</a></li>
-            <li><a th:href="@{/board/{id}(id=${board.boardId})}" th:text="${board.boardId}"
-                    style="color: var(--primary);">Board</a></li>
-        </ul>
-        <div class="nav-actions">
-            <a href="/admin" class="btn-primary" th:text="#{common.dashboard}">Dashboard</a>
-        </div>
-    </nav>
+    <nav th:replace="~{fragments/header :: header('board')}"></nav>
 
     <div class="container">
         <div class="board-header">
