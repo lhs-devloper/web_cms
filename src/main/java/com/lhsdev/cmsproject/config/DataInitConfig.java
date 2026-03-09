@@ -19,6 +19,8 @@ public class DataInitConfig {
         @Autowired
         private UserRepository userRepository;
         @Autowired
+        private com.lhsdev.cmsproject.repository.MainMenuRepository mainMenuRepository;
+        @Autowired
         private PasswordEncoder passwordEncoder;
 
         @Bean
@@ -45,8 +47,8 @@ public class DataInitConfig {
                                 // Seed Google (Placeholder)
                                 socialRepository.save(SocialServiceConfig.builder()
                                                 .registrationId("google")
-                                                .clientId("YOUR_GOOGLE_CLIENT_ID")
-                                                .clientSecret("YOUR_GOOGLE_CLIENT_SECRET")
+                                                .clientId("dummy-google-id")
+                                                .clientSecret("dummy-google-secret")
                                                 .clientAuthenticationMethod("client_secret_basic")
                                                 .authorizationGrantType("authorization_code")
                                                 .redirectUri("{baseUrl}/{action}/oauth2/code/{registrationId}")
@@ -57,8 +59,8 @@ public class DataInitConfig {
                                 // Seed Kakao (Placeholder)
                                 socialRepository.save(SocialServiceConfig.builder()
                                                 .registrationId("kakao")
-                                                .clientId("YOUR_KAKAO_CLIENT_ID")
-                                                .clientSecret("YOUR_KAKAO_CLIENT_SECRET")
+                                                .clientId("20543122589b138f374315f3bbd94eb6")
+                                                .clientSecret("qdGGE9cr0gs6XB8exvWJWuqyA7k864ZM")
                                                 .clientAuthenticationMethod("client_secret_post")
                                                 .authorizationGrantType("authorization_code")
                                                 .redirectUri("{baseUrl}/{action}/oauth2/code/{registrationId}")
@@ -73,8 +75,8 @@ public class DataInitConfig {
                                 // Seed Github (Placeholder)
                                 socialRepository.save(SocialServiceConfig.builder()
                                                 .registrationId("github")
-                                                .clientId("YOUR_GITHUB_CLIENT_ID")
-                                                .clientSecret("YOUR_GITHUB_CLIENT_SECRET")
+                                                .clientId("dummy-github-id")
+                                                .clientSecret("dummy-github-secret")
                                                 .clientAuthenticationMethod("client_secret_basic")
                                                 .authorizationGrantType("authorization_code")
                                                 .redirectUri("{baseUrl}/{action}/oauth2/code/{registrationId}")
@@ -107,6 +109,45 @@ public class DataInitConfig {
                                         userRepository.save(user);
                                 }
                                 System.out.println("All legacy users updated with secure random passwords.");
+                        }
+
+                        // 3. Main Menu Initialization
+                        if (mainMenuRepository.count() == 0) {
+                                mainMenuRepository.save(com.lhsdev.cmsproject.domain.menu.MainMenu.builder()
+                                                .title("신상품")
+                                                .linkUrl("#new")
+                                                .sortOrder(0)
+                                                .isActive(true)
+                                                .build());
+                                mainMenuRepository.save(com.lhsdev.cmsproject.domain.menu.MainMenu.builder()
+                                                .title("카테고리")
+                                                .linkUrl("#categories")
+                                                .sortOrder(1)
+                                                .isActive(true)
+                                                .build());
+                                mainMenuRepository.save(com.lhsdev.cmsproject.domain.menu.MainMenu.builder()
+                                                .title("베스트")
+                                                .linkUrl("#featured")
+                                                .sortOrder(2)
+                                                .isActive(true)
+                                                .build());
+                                mainMenuRepository.save(com.lhsdev.cmsproject.domain.menu.MainMenu.builder()
+                                                .title("브랜드 스토리")
+                                                .linkUrl("#about")
+                                                .sortOrder(3)
+                                                .isActive(true)
+                                                .build());
+                        }
+
+                        // 4. Create test user for development
+                        if (userRepository.findByEmail("test@test.com").isEmpty()) {
+                                userRepository.save(com.lhsdev.cmsproject.domain.user.User.builder()
+                                                .name("테스트유저")
+                                                .email("test@test.com")
+                                                .password(passwordEncoder.encode("1234"))
+                                                .role(com.lhsdev.cmsproject.domain.user.Role.USER)
+                                                .provider(com.lhsdev.cmsproject.domain.user.AuthProvider.LOCAL)
+                                                .build());
                         }
                 };
         }

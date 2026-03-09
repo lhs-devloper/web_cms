@@ -51,13 +51,19 @@ public class MainBannerService {
             banner.setImageUrl(imageUrl);
         }
 
-        banner.setTitle(requestBanner.getTitle());
-        banner.setDescription(requestBanner.getDescription());
-        banner.setLinkUrl(requestBanner.getLinkUrl());
-        banner.setSortOrder(requestBanner.getSortOrder());
-        banner.setIsActive(requestBanner.getIsActive());
-
-        // No explicit save needed in Transactional, but harmless
+        banner.update(
+                requestBanner.getSubtitle(),
+                requestBanner.getTitle(),
+                requestBanner.getDescription(),
+                banner.getImageUrl(),
+                requestBanner.getLinkUrl(),
+                requestBanner.getTitleFontSize(),
+                requestBanner.getTitleColor(),
+                requestBanner.getSubtitleColor(),
+                requestBanner.getTextAlignment(),
+                requestBanner.getButtonsJson(),
+                requestBanner.getSortOrder(),
+                requestBanner.getIsActive());
     }
 
     @Transactional
@@ -66,13 +72,7 @@ public class MainBannerService {
     }
 
     private String uploadFile(MultipartFile file) throws IOException {
-        // Use configured uploadDir. Ensure it ends with / before appending subfolder
-        String basePath = uploadDir;
-        if (!basePath.endsWith("/") && !basePath.endsWith("\\")) {
-            basePath += "/";
-        }
-
-        Path uploadPath = Paths.get(basePath + "banners");
+        Path uploadPath = Paths.get(uploadDir, "banners").toAbsolutePath().normalize();
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }

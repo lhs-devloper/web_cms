@@ -25,28 +25,19 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Ensure the directory exists
-        File directory = new File(uploadDir);
+        java.nio.file.Path path = java.nio.file.Paths.get(uploadDir).toAbsolutePath().normalize();
+        File directory = path.toFile();
+
         if (!directory.exists()) {
             boolean created = directory.mkdirs();
             System.out.println("Created upload directory: " + directory.getAbsolutePath() + " -> " + created);
         }
 
-        // Map URL path '/uploads/**' to physical directory
-        String path = uploadDir;
-        if (!path.endsWith("/") && !path.endsWith("\\")) {
-            path += "/";
-        }
-
-        // Add file protocol prefix
-        if (!path.startsWith("file:")) {
-            path = "file:///" + path;
-        }
-
-        System.out.println("Mapping /uploads/** to " + path);
+        String location = path.toUri().toString();
+        System.out.println("Mapping /uploads/** to " + location);
 
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations(path);
+                .addResourceLocations(location);
     }
 
     @Override

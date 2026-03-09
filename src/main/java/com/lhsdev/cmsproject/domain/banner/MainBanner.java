@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,12 +29,26 @@ public class MainBanner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Content
+    private String subtitle;
     private String title;
     private String description;
-    private String imageUrl;
+    private String imageUrl; // Can be image or video URL
     private String linkUrl;
-    private Integer sortOrder;
-    private Boolean isActive;
+
+    // Style & Positioning Controls
+    private String titleFontSize = "5.5rem";
+    private String titleColor = "#ffffff";
+    private String subtitleColor = "#00d2ff"; // Default to primary-color
+    private String textAlignment = "left"; // "left", "center", "right"
+
+    // Buttons (JSON Format)
+    @Column(columnDefinition = "TEXT")
+    private String buttonsJson = "[{\"text\":\"SHOP NOW\", \"linkUrl\":\"#\", \"bgColor\":\"#ffffff\", \"textColor\":\"#000000\"}]";
+
+    // Metadata
+    private Integer sortOrder = 0;
+    private Boolean isActive = true;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -42,24 +57,38 @@ public class MainBanner {
     private LocalDateTime updatedAt;
 
     @Builder
-    public MainBanner(String title, String description, String imageUrl, String linkUrl, Integer sortOrder,
-            Boolean isActive) {
+    public MainBanner(String subtitle, String title, String description, String imageUrl, String linkUrl,
+            String titleFontSize, String titleColor, String subtitleColor, String textAlignment,
+            String buttonsJson, Integer sortOrder, Boolean isActive) {
+        this.subtitle = subtitle;
         this.title = title;
         this.description = description;
         this.imageUrl = imageUrl;
         this.linkUrl = linkUrl;
+        this.titleFontSize = titleFontSize;
+        this.titleColor = titleColor;
+        this.subtitleColor = subtitleColor;
+        this.textAlignment = textAlignment;
+        this.buttonsJson = buttonsJson != null ? buttonsJson : "[]";
         this.sortOrder = sortOrder;
         this.isActive = isActive;
     }
 
-    public void update(String title, String description, String imageUrl, String linkUrl, Integer sortOrder,
-            Boolean isActive) {
+    public void update(String subtitle, String title, String description, String imageUrl, String linkUrl,
+            String titleFontSize, String titleColor, String subtitleColor, String textAlignment,
+            String buttonsJson, Integer sortOrder, Boolean isActive) {
+        this.subtitle = subtitle;
         this.title = title;
         this.description = description;
         if (imageUrl != null && !imageUrl.isEmpty()) {
             this.imageUrl = imageUrl;
         }
         this.linkUrl = linkUrl;
+        this.titleFontSize = titleFontSize;
+        this.titleColor = titleColor;
+        this.subtitleColor = subtitleColor;
+        this.textAlignment = textAlignment;
+        this.buttonsJson = buttonsJson != null ? buttonsJson : "[]";
         this.sortOrder = sortOrder;
         this.isActive = isActive;
     }

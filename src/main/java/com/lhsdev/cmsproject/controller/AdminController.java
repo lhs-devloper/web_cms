@@ -2,23 +2,21 @@ package com.lhsdev.cmsproject.controller;
 
 import com.lhsdev.cmsproject.config.SessionListener;
 import com.lhsdev.cmsproject.entity.Menu;
-import com.lhsdev.cmsproject.entity.SiteSetting;
+
 import com.lhsdev.cmsproject.repository.BoardMetaRepository;
 import com.lhsdev.cmsproject.repository.MenuRepository;
 import com.lhsdev.cmsproject.service.BoardService;
-import com.lhsdev.cmsproject.service.SettingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@Controller
-@RequestMapping("/admin")
+@RestController
+@RequestMapping("/api/admin")
 @RequiredArgsConstructor
 public class AdminController {
     @Autowired
@@ -26,111 +24,82 @@ public class AdminController {
     @Autowired
     private BoardMetaRepository boardMetaRepository;
     @Autowired
-    private SettingService settingService;
-    @Autowired
     private MenuRepository menuRepository;
 
     private final com.lhsdev.cmsproject.service.VisitorService visitorService;
 
     @GetMapping({ "", "/" })
-    public String main(Model model) {
-        model.addAttribute("activeSessionCount", SessionListener.getActiveSessions());
-        // For Active Users (Sessions), we might prefer real-time session count from
-        // listener.
-        // For Visits (Traffic), we use the database service.
-        model.addAttribute("todayVisitorCount", visitorService.getTodayVisitorCount());
-        model.addAttribute("totalVisitorCount", visitorService.getTotalVisitorCount());
-
-        model.addAttribute("latestPosts", boardService.getLatestPostsFromCheckedBoards());
-        return "admin/main";
-    }
-
-    @GetMapping("/setting")
-    public String setting(Model model) {
-        model.addAttribute("siteSetting", settingService.getSetting());
-        return "admin/setting";
-    }
-
-    @PostMapping("/setting/save")
-    public String saveSetting(@ModelAttribute SiteSetting siteSetting, RedirectAttributes redirectAttributes) {
-        try {
-            settingService.saveSetting(siteSetting);
-            redirectAttributes.addFlashAttribute("message", "설정이 성공적으로 저장되었습니다.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "저장 실패: " + e.getMessage());
-        }
-        return "redirect:/admin/setting";
+    public ResponseEntity<?> main() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("activeSessionCount", SessionListener.getActiveSessions());
+        response.put("todayVisitorCount", visitorService.getTodayVisitorCount());
+        response.put("totalVisitorCount", visitorService.getTotalVisitorCount());
+        response.put("latestPosts", boardService.getLatestPostsFromCheckedBoards());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/board")
-    public String boardManage(Model model) {
-        model.addAttribute("boards", boardMetaRepository.findAll());
-        return "admin/board";
-    }
-
-    @GetMapping("/board/new")
-    public String boardCreateForm() {
-        return "admin/board_create";
+    public ResponseEntity<?> boardManage() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("boards", boardMetaRepository.findAll());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/board/create")
-    public String createBoard(@RequestParam("boardId") String boardId,
+    public ResponseEntity<?> createBoard(@RequestParam("boardId") String boardId,
             @RequestParam(value = "readPermission", defaultValue = "ALL") String readPermission,
             @RequestParam(value = "writePermission", defaultValue = "ALL") String writePermission,
-            @RequestParam(value = "checkUpdate", defaultValue = "false") boolean checkUpdate,
-            RedirectAttributes redirectAttributes) {
+            @RequestParam(value = "checkUpdate", defaultValue = "false") boolean checkUpdate) {
         try {
             boardService.createBoardTable(boardId, readPermission, writePermission, checkUpdate);
-            redirectAttributes.addFlashAttribute("message", "게시판 'cms_board_" + boardId + "'이(가) 성공적으로 생성되었습니다.");
+            return ResponseEntity
+                    .ok(Map.of("success", true, "message", "게시판 'cms_board_" + boardId + "'이(가) 성공적으로 생성되었습니다."));
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "게시판 생성 실패: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", "게시판 생성 실패: " + e.getMessage()));
         }
-        return "redirect:/admin/board";
     }
 
     @GetMapping("/board/edit/{boardId}")
-    public String editBoardForm(@PathVariable("boardId") String boardId, Model model) {
-        boardMetaRepository.findByBoardId(boardId).ifPresent(meta -> model.addAttribute("board", meta));
-        return "admin/board_edit";
+    public ResponseEntity<?> editBoardForm(@PathVariable("boardId") String boardId) {
+        var boardOpt = boardMetaRepository.findByBoardId(boardId);
+        if (boardOpt.isEmpty())
+            return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(Map.of("board", boardOpt.get()));
     }
 
     @PostMapping("/board/update")
-    public String updateBoard(@RequestParam("boardId") String boardId,
+    public ResponseEntity<?> updateBoard(@RequestParam("boardId") String boardId,
             @RequestParam("readPermission") String readPermission,
             @RequestParam("writePermission") String writePermission,
-            @RequestParam(value = "checkUpdate", defaultValue = "false") boolean checkUpdate,
-            RedirectAttributes redirectAttributes) {
+            @RequestParam(value = "checkUpdate", defaultValue = "false") boolean checkUpdate) {
         try {
             boardService.updateBoard(boardId, readPermission, writePermission, checkUpdate);
-            redirectAttributes.addFlashAttribute("message", "게시판 설정이 업데이트되었습니다.");
+            return ResponseEntity.ok(Map.of("success", true, "message", "게시판 설정이 업데이트되었습니다."));
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "업데이트 실패: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", "업데이트 실패: " + e.getMessage()));
         }
-        return "redirect:/admin/board";
     }
 
     @PostMapping("/board/delete")
-    public String deleteBoard(@RequestParam("boardId") String boardId, RedirectAttributes redirectAttributes) {
+    public ResponseEntity<?> deleteBoard(@RequestParam("boardId") String boardId) {
         try {
             boardService.deleteBoard(boardId);
-            redirectAttributes.addFlashAttribute("message", "게시판이 성공적으로 삭제되었습니다.");
+            return ResponseEntity.ok(Map.of("success", true, "message", "게시판이 성공적으로 삭제되었습니다."));
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "삭제 실패: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", "삭제 실패: " + e.getMessage()));
         }
-        return "redirect:/admin/board";
     }
 
-    // --- Menu Management ---
     @GetMapping("/menu")
-    public String menuManage(Model model) {
-        model.addAttribute("menus", menuRepository.findAllByOrderBySortOrderAscMain1DepthAscMain2DepthAsc());
-        model.addAttribute("existing1Depths", menuRepository.findDistinctMain1Depth());
-        model.addAttribute("existingLinks", menuRepository.findDistinctLinks());
-        return "admin/menu";
+    public ResponseEntity<?> menuManage() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("menus", menuRepository.findAllByOrderBySortOrderAscMain1DepthAscMain2DepthAsc());
+        response.put("existing1Depths", menuRepository.findDistinctMain1Depth());
+        response.put("existingLinks", menuRepository.findDistinctLinks());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/menu/reorder")
-    @ResponseBody
     public ResponseEntity<?> reorderMenus(@RequestBody List<Long> menuIds) {
         try {
             for (int i = 0; i < menuIds.size(); i++) {
@@ -141,29 +110,27 @@ public class AdminController {
             }
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            return ResponseEntity.internalServerError().body(Map.of("message", e.getMessage()));
         }
     }
 
     @PostMapping("/menu/save")
-    public String saveMenu(@ModelAttribute Menu menu, RedirectAttributes redirectAttributes) {
+    public ResponseEntity<?> saveMenu(@ModelAttribute Menu menu) {
         try {
             menuRepository.save(menu);
-            redirectAttributes.addFlashAttribute("message", "메뉴가 성공적으로 저장되었습니다.");
+            return ResponseEntity.ok(Map.of("success", true, "message", "메뉴가 성공적으로 저장되었습니다."));
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "메뉴 저장 실패: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", "메뉴 저장 실패: " + e.getMessage()));
         }
-        return "redirect:/admin/menu";
     }
 
     @PostMapping("/menu/delete")
-    public String deleteMenu(@RequestParam("id") Long id, RedirectAttributes redirectAttributes) {
+    public ResponseEntity<?> deleteMenu(@RequestParam("id") Long id) {
         try {
             menuRepository.deleteById(id);
-            redirectAttributes.addFlashAttribute("message", "메뉴가 삭제되었습니다.");
+            return ResponseEntity.ok(Map.of("success", true, "message", "메뉴가 삭제되었습니다."));
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "메뉴 삭제 실패: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", "메뉴 삭제 실패: " + e.getMessage()));
         }
-        return "redirect:/admin/menu";
     }
 }

@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root,
+[data-theme="dark"] {
+  /* Dark Mode Colors (Default) */
+  --bg-color: #0f1115;
+  --bg-darker: #090a0c;
+  --bg-lighter: #14171d;
+  --panel-bg: #14171d;
+  --header-bg: #1a1d24;
+  --text-color: #f8fafc;
+  --text-primary: #ffffff;
+  --text-muted-alt: #94a3b8;
+  --text-disabled: #64748b;
+  --title-color: #f8fafc;
+  --label-color: #e2e8f0;
+  --muted-color: #a0aec0;
+  --placeholder-color: #475569;
+  --icon-color: #cbd5e1;
+  --disabled-bg: #4a5568;
+  --disabled-color: #cbd5e0;
+  --bg-black: #000000;
+
+  --input-bg: rgba(0, 0, 0, 0.2);
+  --input-focus-bg: rgba(0, 0, 0, 0.4);
+  --input-border: rgba(255, 255, 255, 0.15);
+  --input-text: #f1f5f9;
+  --input-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+
+  --card-bg: rgba(20, 23, 29, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(20, 23, 29, 0.4);
+  --glass-rgb: 255, 255, 255;
+  --shadow-rgb: 0, 0, 0;
+
+  --primary-color: #00d2ff;
+  --secondary-color: #3a7bd5;
+
+  /* Spacing & Layout */
+  --max-width: 1200px;
+  --nav-height: 80px;
+
+  /* Typography */
+  --font-main: 'Inter', sans-serif;
+}
+
+[data-theme="light"] {
+  /* Light Mode Colors */
+  --bg-color: #f1f5f9;
+  --bg-darker: #e2e8f0;
+  --bg-lighter: #ffffff;
+  --panel-bg: #ffffff;
+  --header-bg: #f8fafc;
+  --text-color: #1e293b;
+  --text-primary: #0f172a;
+  --text-muted-alt: #475569;
+  --text-disabled: #94a3b8;
+  --title-color: #0f172a;
+  --label-color: #334155;
+  --muted-color: #64748b;
+  --placeholder-color: #94a3b8;
+  --icon-color: #475569;
+  --disabled-bg: #e2e8f0;
+  --disabled-color: #94a3b8;
+  --bg-black: #ffffff;
+  /* for inverse text matching */
+
+  --input-bg: #f8fafc;
+  --input-focus-bg: #ffffff;
+  --input-border: rgba(0, 0, 0, 0.1);
+  --input-text: #0f172a;
+  --input-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
+
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --border-color: rgba(0, 0, 0, 0.1);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-rgb: 0, 0, 0;
+  --shadow-rgb: 0, 0, 0;
+
+  --primary-color: #0284c7;
+  --secondary-color: #2563eb;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+a:hover {
+  opacity: 0.8;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: var(--font-main);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease forwards;
+}
+
+/* Global utility */
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 2rem;
+}

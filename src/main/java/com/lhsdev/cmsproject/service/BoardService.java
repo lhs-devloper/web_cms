@@ -132,6 +132,57 @@ public class BoardService {
         jdbcTemplate.update(sql, title, content, author, authorId, password, ip);
     }
 
+    @Transactional
+    public void updatePost(String boardId, Long id, String title, String content, String password, String userId,
+            boolean isAdmin) {
+        BoardMeta meta = boardMetaRepository.findByBoardId(boardId)
+                .orElseThrow(() -> new RuntimeException("게시판을 찾을 수 없습니다."));
+
+        String authCheckSql = "SELECT password, author_id FROM " + meta.getTableName() + " WHERE id = ?";
+        Map<String, Object> post = jdbcTemplate.queryForMap(authCheckSql, id);
+
+        if (!isAdmin) {
+            String dbAuthorId = post.get("author_id") != null ? post.get("author_id").toString() : null;
+            String dbPassword = post.get("password") != null ? post.get("password").toString() : null;
+
+            if (dbAuthorId != null && dbAuthorId.equals(userId)) {
+                // Authorized by user ID
+            } else if (dbPassword != null && dbPassword.equals(password)) {
+                // Authorized by password
+            } else {
+                throw new RuntimeException("수정 권한이 없거나 비밀번호가 일치하지 않습니다.");
+            }
+        }
+
+        String sql = "UPDATE " + meta.getTableName() + " SET title = ?, content = ? WHERE id = ?";
+        jdbcTemplate.update(sql, title, content, id);
+    }
+
+    @Transactional
+    public void deletePost(String boardId, Long id, String password, String userId, boolean isAdmin) {
+        BoardMeta meta = boardMetaRepository.findByBoardId(boardId)
+                .orElseThrow(() -> new RuntimeException("게시판을 찾을 수 없습니다."));
+
+        String authCheckSql = "SELECT password, author_id FROM " + meta.getTableName() + " WHERE id = ?";
+        Map<String, Object> post = jdbcTemplate.queryForMap(authCheckSql, id);
+
+        if (!isAdmin) {
+            String dbAuthorId = post.get("author_id") != null ? post.get("author_id").toString() : null;
+            String dbPassword = post.get("password") != null ? post.get("password").toString() : null;
+
+            if (dbAuthorId != null && dbAuthorId.equals(userId)) {
+                // Authorized by user ID
+            } else if (dbPassword != null && dbPassword.equals(password)) {
+                // Authorized by password
+            } else {
+                throw new RuntimeException("삭제 권한이 없거나 비밀번호가 일치하지 않습니다.");
+            }
+        }
+
+        String sql = "DELETE FROM " + meta.getTableName() + " WHERE id = ?";
+        jdbcTemplate.update(sql, id);
+    }
+
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getLatestPostsFromCheckedBoards() {
         List<BoardMeta> checkedBoards = boardMetaRepository.findByCheckUpdateTrue();

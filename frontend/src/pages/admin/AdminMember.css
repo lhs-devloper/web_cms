@@ -1,0 +1,172 @@
+.admin-member-container {
+    padding: 2rem;
+    background: var(--bg-color, var(--bg-color));
+    min-height: 100vh;
+    color: var(--text-primary);
+}
+
+.admin-member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(var(--glass-rgb), 0.1);
+    padding-bottom: 1rem;
+}
+
+.admin-member-header h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.admin-member-filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.filter-input {
+    background: rgba(var(--shadow-rgb), 0.2);
+    border: 1px solid rgba(var(--glass-rgb), 0.1);
+    color: var(--text-primary);
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.filter-input:focus {
+    border-color: var(--primary-color, var(--primary-color));
+    outline: none;
+}
+
+.btn-search {
+    background: var(--primary-color, var(--primary-color));
+    color: var(--bg-black);
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-search:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.admin-member-list {
+    background: rgba(var(--glass-rgb), 0.02);
+    border-radius: 12px;
+    border: 1px solid rgba(var(--glass-rgb), 0.05);
+    overflow: hidden;
+}
+
+.member-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.member-table th,
+.member-table td {
+    padding: 1.2rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(var(--glass-rgb), 0.05);
+    color: #e0e0e0;
+}
+
+.member-table th {
+    background: rgba(var(--glass-rgb), 0.04);
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.member-profile-cell {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.member-profile-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(var(--glass-rgb), 0.1);
+}
+
+.member-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.provider-badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.provider-badge.LOCAL {
+    background: rgba(var(--glass-rgb), 0.1);
+    color: var(--text-primary);
+}
+
+.provider-badge.KAKAO {
+    background: rgba(254, 229, 0, 0.2);
+    color: #f2c94c;
+}
+
+.provider-badge.NAVER {
+    background: rgba(3, 199, 90, 0.2);
+    color: #00e676;
+}
+
+.provider-badge.GOOGLE {
+    background: rgba(234, 67, 53, 0.2);
+    color: #ff5252;
+}
+
+.provider-badge.GITHUB {
+    background: rgba(var(--glass-rgb), 0.2);
+    color: var(--text-primary);
+}
+
+.role-select {
+    background: rgba(var(--shadow-rgb), 0.3);
+    border: 1px solid rgba(var(--glass-rgb), 0.2);
+    color: var(--text-primary);
+    padding: 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.role-select:focus {
+    border-color: var(--primary-color, var(--primary-color));
+    outline: none;
+}
+
+.role-select option {
+    background: var(--header-bg);
+    color: var(--text-primary);
+}
+
+.btn-delete-small {
+    background: rgba(244, 67, 54, 0.1);
+    color: #ff5252;
+    border: 1px solid rgba(244, 67, 54, 0.2);
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-delete-small:hover {
+    background: rgba(244, 67, 54, 0.2);
+    border-color: rgba(244, 67, 54, 0.4);
+}

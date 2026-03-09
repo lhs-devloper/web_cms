@@ -1,0 +1,412 @@
+.admin-menu-container {
+    padding: 2rem;
+    background: var(--bg-color, var(--bg-color));
+    min-height: 100vh;
+    color: var(--text-primary);
+}
+
+.admin-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(var(--glass-rgb), 0.1);
+    padding-bottom: 1rem;
+}
+
+.admin-menu-header h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.btn-save {
+    background: var(--primary-color, var(--primary-color));
+    color: var(--bg-black);
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* -- Menu Table -- */
+.admin-menu-list {
+    margin-top: 1.5rem;
+    background: var(--panel-bg);
+    border-radius: 12px;
+    border: 1px solid rgba(var(--glass-rgb), 0.08);
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(var(--shadow-rgb), 0.2);
+}
+
+.menu-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.menu-table th,
+.menu-table td {
+    padding: 1rem 1.2rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(var(--glass-rgb), 0.04);
+    color: var(--icon-color);
+    vertical-align: middle;
+}
+
+.menu-table th {
+    background: rgba(var(--shadow-rgb), 0.2);
+    font-weight: 600;
+    color: var(--muted-color);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1.2rem;
+}
+
+/* Group Separator */
+.main-menu-row td {
+    border-top: 1px solid rgba(var(--glass-rgb), 0.08);
+}
+
+tbody tr:first-child.main-menu-row td {
+    border-top: none;
+}
+
+.sub-menu-row td {
+    border-bottom: 1px dashed rgba(var(--glass-rgb), 0.03);
+}
+
+/* Table Layout */
+.menu-table th.col-drag,
+.menu-table td.col-drag {
+    width: 60px;
+    text-align: center;
+    padding-left: 1.5rem;
+}
+
+.menu-table th.col-status,
+.menu-table td.col-status {
+    width: 120px;
+    text-align: center;
+}
+
+.menu-table th.col-actions,
+.menu-table td.col-actions {
+    width: 250px;
+    text-align: right;
+    padding-right: 1.5rem;
+}
+
+/* Colors & Hovers */
+.main-menu-row {
+    background: transparent;
+    transition: background 0.2s ease;
+}
+
+.main-menu-row:hover {
+    background: rgba(var(--glass-rgb), 0.02);
+}
+
+.sub-menu-row {
+    background: rgba(var(--shadow-rgb), 0.15);
+    transition: background 0.2s ease;
+}
+
+.sub-menu-row:hover {
+    background: rgba(var(--glass-rgb), 0.02);
+}
+
+/* Typography styles */
+.title-main {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.title-sub {
+    padding-left: 3rem !important;
+    color: var(--muted-color);
+    font-size: 0.95rem;
+}
+
+.sub-icon {
+    vertical-align: middle;
+    margin-right: 8px;
+    opacity: 0.5;
+    color: #64748b;
+}
+
+.col-link {
+    color: var(--muted-color);
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+.sub-link {
+    color: #64748b;
+    font-family: monospace;
+    font-size: 0.85rem;
+}
+
+/* Drag Handle */
+.drag-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    color: var(--placeholder-color);
+    transition: color 0.2s;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+}
+
+.drag-handle:hover {
+    color: var(--text-primary);
+    background: rgba(var(--glass-rgb), 0.05);
+}
+
+.draggable-row {
+    cursor: grab;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.draggable-row:active {
+    cursor: grabbing;
+}
+
+.draggable-row.dragging {
+    opacity: 0.4;
+    background: rgba(0, 210, 255, 0.05);
+}
+
+.draggable-row.drag-over {
+    background: rgba(var(--glass-rgb), 0.04);
+}
+
+/* Visual drop indicator */
+.draggable-row.drag-over td {
+    border-top: 2px solid var(--primary-color, var(--primary-color));
+    border-bottom: 2px solid var(--primary-color, var(--primary-color));
+}
+
+/* Status Badge */
+.status-badge {
+    padding: 0.35rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-badge.active {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.status-badge.inactive {
+    background: rgba(148, 163, 184, 0.1);
+    color: var(--muted-color);
+}
+
+.status-badge.small {
+    transform: scale(0.9);
+}
+
+/* Action Buttons */
+.btn-action {
+    background: transparent;
+    border: none;
+    color: var(--muted-color);
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-right: 0.3rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-action:last-child {
+    margin-right: 0;
+}
+
+.btn-action:hover {
+    background: rgba(var(--glass-rgb), 0.05);
+    color: var(--text-primary);
+}
+
+.btn-add-sub {
+    color: #38bdf8;
+}
+
+.btn-add-sub:hover {
+    background: rgba(56, 189, 248, 0.1);
+    color: #38bdf8;
+}
+
+.btn-edit:hover {
+    color: var(--text-primary);
+}
+
+.btn-delete {
+    color: #f43f5e;
+}
+
+.btn-delete:hover {
+    background: rgba(244, 63, 94, 0.1);
+    color: #f43f5e;
+}
+
+.modal-info-box {
+    background: rgba(56, 189, 248, 0.05);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    color: #38bdf8;
+    font-size: 0.9rem;
+    border: 1px solid rgba(56, 189, 248, 0.1);
+}
+
+/* Modal Styles */
+.admin-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(var(--shadow-rgb), 0.8);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.admin-modal-content {
+    background: var(--header-bg);
+    width: 90%;
+    max-width: 500px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(var(--shadow-rgb), 0.5);
+    border: 1px solid rgba(var(--glass-rgb), 0.1);
+}
+
+.modal-header {
+    background: rgba(var(--glass-rgb), 0.02);
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(var(--glass-rgb), 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.btn-close-modal {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--text-muted-alt);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.btn-close-modal:hover {
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.input-group {
+    margin-bottom: 1.5rem;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted-alt);
+    margin-bottom: 0.5rem;
+}
+
+.input-group input[type="text"] {
+    width: 100%;
+    padding: 0.8rem;
+    background: rgba(var(--shadow-rgb), 0.2);
+    border: 1px solid rgba(var(--glass-rgb), 0.1);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    transition: all 0.2s;
+}
+
+.input-group input[type="text"]:focus {
+    border-color: var(--primary-color, var(--primary-color));
+    outline: none;
+    background: rgba(var(--shadow-rgb), 0.3);
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    color: #e0e0e0;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 1.2rem;
+    height: 1.2rem;
+    cursor: pointer;
+    accent-color: var(--primary-color, var(--primary-color));
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(var(--glass-rgb), 0.1);
+}
+
+.btn-submit {
+    background: var(--primary-color, var(--primary-color));
+    color: var(--bg-black);
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.btn-submit:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.btn-submit:disabled {
+    background: #555;
+    color: var(--text-disabled);
+    cursor: not-allowed;
+    transform: none;
+}

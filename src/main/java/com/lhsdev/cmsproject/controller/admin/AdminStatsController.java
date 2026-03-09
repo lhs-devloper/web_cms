@@ -3,26 +3,27 @@ package com.lhsdev.cmsproject.controller.admin;
 import com.lhsdev.cmsproject.dto.DailyVisitorStats;
 import com.lhsdev.cmsproject.service.VisitorService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-@Controller
-@RequestMapping("/admin/stats")
+@RestController
+@RequestMapping("/api/admin/stats")
 @RequiredArgsConstructor
 public class AdminStatsController {
 
     private final VisitorService visitorService;
 
     @GetMapping
-    public String stats(Model model) {
-        // Fetch last 30 days
+    public ResponseEntity<?> stats() {
         List<DailyVisitorStats> stats = visitorService.getDailyStats(30);
 
-        // Transform for Chart.js
         List<String> labels = stats.stream()
                 .map(s -> "\"" + s.getDate().toString() + "\"")
                 .collect(Collectors.toList());
@@ -30,14 +31,12 @@ public class AdminStatsController {
                 .map(DailyVisitorStats::getCount)
                 .collect(Collectors.toList());
 
-        model.addAttribute("visitorLabels", labels);
-        model.addAttribute("visitorData", data);
-        model.addAttribute("todayCount", visitorService.getTodayVisitorCount());
-        model.addAttribute("totalCount", visitorService.getTotalVisitorCount());
+        Map<String, Object> response = new HashMap<>();
+        response.put("visitorLabels", labels);
+        response.put("visitorData", data);
+        response.put("todayCount", visitorService.getTodayVisitorCount());
+        response.put("totalCount", visitorService.getTotalVisitorCount());
 
-        // Active link sidebar
-        model.addAttribute("activeLink", "stats");
-
-        return "admin/stats";
+        return ResponseEntity.ok(response);
     }
 }

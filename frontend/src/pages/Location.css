@@ -1,0 +1,256 @@
+.location-page {
+    background: var(--bg-color);
+    min-height: 100vh;
+    padding-top: var(--nav-height);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.location-hero {
+    position: relative;
+    padding: 120px 0;
+    text-align: center;
+    border-bottom: 1px solid rgba(var(--glass-rgb), 0.05);
+}
+
+.location-hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.1), transparent 60%),
+        radial-gradient(circle at 80% 50%, rgba(0, 210, 255, 0.1), transparent 60%);
+    z-index: 0;
+}
+
+.location-hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.location-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--text-primary), var(--muted-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+}
+
+.location-subtitle {
+    font-size: 1.25rem;
+    color: var(--icon-color);
+}
+
+.location-section {
+    padding: 100px 0;
+}
+
+.map-section {
+    background: var(--panel-bg);
+}
+
+.transport-section {
+    background: var(--bg-darker);
+}
+
+.map-container {
+    width: 100%;
+    height: 500px;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 4rem;
+    border: 1px solid rgba(var(--glass-rgb), 0.1);
+    box-shadow: 0 20px 40px rgba(var(--shadow-rgb), 0.5);
+    background: rgba(var(--glass-rgb), 0.02);
+}
+
+[data-theme="dark"] .map-iframe {
+    filter: invert(90%) hue-rotate(180deg) brightness(80%) contrast(90%);
+}
+
+.map-iframe {
+    width: 100%;
+    height: 100%;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+}
+
+.info-card {
+    background: rgba(var(--glass-rgb), 0.02);
+    border: 1px solid rgba(var(--glass-rgb), 0.05);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    background: rgba(var(--glass-rgb), 0.04);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.info-icon {
+    color: #22c55e;
+    margin-bottom: 1.2rem;
+}
+
+.info-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.8rem;
+}
+
+.info-card p {
+    font-size: 0.95rem;
+    color: var(--icon-color);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.info-sub {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.text-center {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.transport-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.transport-card {
+    background: rgba(var(--glass-rgb), 0.02);
+    border: 1px solid rgba(var(--glass-rgb), 0.05);
+    border-radius: 20px;
+    padding: 2.5rem;
+}
+
+.transport-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(var(--glass-rgb), 0.1);
+}
+
+.transport-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+}
+
+.transport-icon.subway {
+    background: rgba(0, 210, 255, 0.2);
+    color: var(--primary-color);
+}
+
+.transport-icon.bus {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.transport-header h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.transport-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.transport-list li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1rem;
+    color: var(--icon-color);
+}
+
+.transport-list li strong {
+    color: var(--text-primary);
+}
+
+.line-badge,
+.bus-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.line-style {
+    background: #555;
+}
+
+.line-2 {
+    background: #3cb44a;
+}
+
+.line-shinbundang {
+    background: #d31145;
+}
+
+.bus-badge.blue {
+    background: #3b82f6;
+}
+
+.bus-badge.green {
+    background: #22c55e;
+}
+
+.bus-badge.red {
+    background: #ef4444;
+}
+
+@media (max-width: 1024px) {
+    .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .location-title {
+        font-size: 2.5rem;
+    }
+
+    .transport-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .map-container {
+        height: 350px;
+    }
+}

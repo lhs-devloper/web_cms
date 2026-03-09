@@ -5,18 +5,18 @@ import com.lhsdev.cmsproject.domain.user.User;
 import com.lhsdev.cmsproject.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-@Controller
-@RequestMapping("/profile")
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/profile")
 @RequiredArgsConstructor
 public class ProfileController {
 
@@ -29,20 +29,23 @@ public class ProfileController {
     private String uploadDir;
 
     @GetMapping
-    public String profile(@AuthenticationPrincipal PrincipalDetails principal, Model model) {
+    public ResponseEntity<?> profile(@AuthenticationPrincipal PrincipalDetails principal) {
         if (principal == null) {
-            return "redirect:/login";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         User user = userRepository.findById(principal.getUser().getId()).orElseThrow();
-        model.addAttribute("user", user);
-        return "profile";
+        Map<String, Object> response = new HashMap<>();
+        response.put("user", user);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/update")
-    public String updateProfile(@AuthenticationPrincipal PrincipalDetails principal,
+    public ResponseEntity<?> updateProfile(@AuthenticationPrincipal PrincipalDetails principal,
             @RequestParam String name,
-            @RequestParam(required = false) org.springframework.web.multipart.MultipartFile file,
-            RedirectAttributes redirectAttributes) {
+            @RequestParam(required = false) MultipartFile file) {
+
+        if (principal == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         User user = userRepository.findById(principal.getUser().getId()).orElseThrow();
 
         String picturePath = user.getPicture();
@@ -60,46 +63,40 @@ public class ProfileController {
                 java.nio.file.Files.copy(file.getInputStream(), path,
                         java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 
-                picturePath = "/uploads/" + fileName;
+                picturePath = "/api/uploads/" + fileName; // Maybe serve static files or redirect
             } catch (java.io.IOException e) {
-                redirectAttributes.addFlashAttribute("error", "프로필 이미지 업로드 실패: " + e.getMessage());
-                return "redirect:/profile";
+                return ResponseEntity.badRequest().body(Map.of("message", "프로필 이미지 업로드 실패: " + e.getMessage()));
             }
         }
 
         user.update(name, picturePath);
         userRepository.save(user);
-
-        // Update session principal
         principal.setUser(user);
 
-        redirectAttributes.addFlashAttribute("message", "프로필이 업데이트되었습니다.");
-        return "redirect:/profile";
+        return ResponseEntity.ok(Map.of("success", true, "message", "프로필이 업데이트되었습니다."));
     }
 
     @PostMapping("/password")
-    public String updatePassword(@AuthenticationPrincipal PrincipalDetails principal,
+    public ResponseEntity<?> updatePassword(@AuthenticationPrincipal PrincipalDetails principal,
             @RequestParam String currentPassword,
             @RequestParam String newPassword,
-            @RequestParam String confirmPassword,
-            RedirectAttributes redirectAttributes) {
+            @RequestParam String confirmPassword) {
+
+        if (principal == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         User user = userRepository.findById(principal.getUser().getId()).orElseThrow();
 
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            redirectAttributes.addFlashAttribute("error", "현재 비밀번호가 일치하지 않습니다.");
-            return "redirect:/profile";
+            return ResponseEntity.badRequest().body(Map.of("message", "현재 비밀번호가 일치하지 않습니다."));
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            redirectAttributes.addFlashAttribute("error", "새 비밀번호가 일치하지 않습니다.");
-            return "redirect:/profile";
+            return ResponseEntity.badRequest().body(Map.of("message", "새 비밀번호가 일치하지 않습니다."));
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
-        redirectAttributes.addFlashAttribute("message", "비밀번호가 변경되었습니다.");
-
-        return "redirect:/profile";
+        return ResponseEntity.ok(Map.of("success", true, "message", "비밀번호가 변경되었습니다."));
     }
 }

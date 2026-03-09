@@ -64,29 +64,6 @@
                 </div>
             </div>
 
-            <!-- PRODUCT Group Dropdown -->
-            <div class="nav-group"
-                th:classappend="${activeLink == 'products' || activeLink == 'categories' ? 'open' : ''}">
-                <div class="nav-group-trigger" onclick="this.parentElement.classList.toggle('open')">
-                    <div class="trigger-info">
-                        <i class="fas fa-box-open fa-fw"></i>
-                        <span>PRODUCT</span>
-                    </div>
-                    <i class="fas fa-chevron-down chevron"></i>
-                </div>
-                <div class="nav-group-content">
-                    <a href="/admin/products" class="sub-nav-item"
-                        th:classappend="${activeLink == 'products' ? 'active' : ''}">
-                        <i class="fas fa-box fa-fw" style="font-size: 0.9rem;"></i>
-                        <span>상품 관리</span>
-                    </a>
-                    <a href="/admin/categories" class="sub-nav-item"
-                        th:classappend="${activeLink == 'categories' ? 'active' : ''}">
-                        <i class="fas fa-sitemap fa-fw" style="font-size: 0.9rem;"></i>
-                        <span>카테고리 관리</span>
-                    </a>
-                </div>
-            </div>
 
             <!-- SYSTEM Group Dropdown -->
             <div class="nav-group" th:classappend="${activeLink == 'setting' ? 'open' : ''}">
