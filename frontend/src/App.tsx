@@ -14,10 +14,15 @@ import AdminMember from './pages/admin/AdminMember';
 import AdminSetting from './pages/admin/AdminSetting';
 import AdminAboutSetting from './pages/admin/AdminAboutSetting';
 import AdminLocationSetting from './pages/admin/AdminLocationSetting';
+import AdminSocialSetting from './pages/admin/AdminSocialSetting';
 import AdminBoards from './pages/admin/AdminBoards';
+import AdminProducts from './pages/admin/AdminProducts';
 import BoardList from './pages/BoardList';
 import BoardView from './pages/BoardView';
 import BoardWrite from './pages/BoardWrite';
+import ProductList from './pages/ProductList';
+import ProductDetail from './pages/ProductDetail';
+import Cart from './pages/Cart';
 import { SiteSettingProvider } from './contexts/SiteSettingContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import './App.css';
@@ -38,6 +43,9 @@ function App() {
               <Route path="/board/:boardId/view/:id" element={<BoardView />} />
               <Route path="/board/:boardId/write" element={<BoardWrite />} />
               <Route path="/board/:boardId/edit/:id" element={<BoardWrite />} />
+              <Route path="/products" element={<ProductList />} />
+              <Route path="/products/:id" element={<ProductDetail />} />
+              <Route path="/cart" element={<Cart />} />
             </Route>
 
             {/* 단독 페이지 영역 (레이아웃 없는 전체화면) */}
@@ -53,7 +61,9 @@ function App() {
               <Route path="settings" element={<AdminSetting />} />
               <Route path="settings/about" element={<AdminAboutSetting />} />
               <Route path="settings/location" element={<AdminLocationSetting />} />
+              <Route path="settings/social" element={<AdminSocialSetting />} />
               <Route path="boards" element={<AdminBoards />} />
+              <Route path="products" element={<AdminProducts />} />
             </Route>
           </Routes>
         </BrowserRouter>

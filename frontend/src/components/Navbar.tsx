@@ -84,7 +84,7 @@ const Navbar = () => {
                         })
                     ) : (
                         <>
-                            <li><a href="#new">신상품</a></li>
+                            <li><Link to="/products">전체 상품</Link></li>
                             <li><a href="#categories">카테고리</a></li>
                             <li><a href="#featured">베스트</a></li>
                             <li><a href="#about">브랜드 스토리</a></li>
@@ -103,10 +103,9 @@ const Navbar = () => {
                     >
                         <User size={20} />
                     </Link>
-                    <button className="icon-btn" aria-label="Cart">
+                    <Link to="/cart" className="icon-btn" aria-label="Cart">
                         <ShoppingCart size={20} />
-                        <span className="cart-badge">3</span>
-                    </button>
+                    </Link>
                     <button
                         className="mobile-menu-btn icon-btn"
                         onClick={() => setMenuOpen(!menuOpen)}

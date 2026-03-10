@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import './Board.css';
 
@@ -16,6 +16,7 @@ const BoardList = () => {
     const { boardId } = useParams();
     const navigate = useNavigate();
     const [posts, setPosts] = useState<Post[]>([]);
+    // @ts-ignore
     const [boardInfo, setBoardInfo] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 

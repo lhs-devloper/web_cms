@@ -1,0 +1,132 @@
+.product-detail-container {
+    padding: 40px 20px;
+}
+
+.product-detail-hero {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 50px;
+}
+
+@media (max-width: 768px) {
+    .product-detail-hero {
+        flex-direction: column;
+    }
+}
+
+.product-detail-image {
+    flex: 1;
+    background: #f5f5f5;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-detail-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-detail-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-detail-info h2 {
+    font-size: 2rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.product-detail-price {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--primary-color, #2c3e50);
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+}
+
+.product-detail-options {
+    background: var(--bg-card);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.rental-options,
+.quantity-option {
+    margin-bottom: 20px;
+}
+
+.rental-options label,
+.quantity-option label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-inputs input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.quantity-controls button {
+    width: 30px;
+    height: 30px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.total-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 30px 0;
+    text-align: right;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.add-cart-btn {
+    flex: 1;
+    padding: 15px;
+    background: #34495e;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+.product-detail-description {
+    margin-top: 40px;
+}
+
+.product-detail-description h3 {
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+}

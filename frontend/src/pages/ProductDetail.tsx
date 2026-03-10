@@ -1,0 +1,147 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import './ProductDetail.css';
+
+interface Product {
+    id: number;
+    name: string;
+    price: number;
+    description: string;
+    type: string;
+    imageUrls: string[];
+}
+
+const ProductDetail: React.FC = () => {
+    const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
+    const [product, setProduct] = useState<Product | null>(null);
+    const [quantity, setQuantity] = useState(1);
+    const [rentalStartDate, setRentalStartDate] = useState('');
+    const [rentalEndDate, setRentalEndDate] = useState('');
+    const [mainImage, setMainImage] = useState<string>('');
+
+    useEffect(() => {
+        fetch(`/api/products/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                setProduct(data);
+                if (data.imageUrls && data.imageUrls.length > 0) {
+                    setMainImage(data.imageUrls[0]);
+                }
+            })
+            .catch(err => console.error(err));
+    }, [id]);
+
+    const handleAddToCart = async () => {
+        if (product?.type === 'RENTAL' && (!rentalStartDate || !rentalEndDate)) {
+            alert('대여 시작일과 종료일을 선택해주세요.');
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    productId: product?.id,
+                    quantity,
+                    rentalStartDate: rentalStartDate || null,
+                    rentalEndDate: rentalEndDate || null
+                })
+            });
+
+            if (res.status === 401) {
+                alert('로그인이 필요합니다.');
+                navigate('/login');
+                return;
+            }
+
+            if (res.ok) {
+                if (confirm('장바구니에 담겼습니다. 장바구니로 이동하시겠습니까?')) {
+                    navigate('/cart');
+                }
+            } else {
+                const errData = await res.json();
+                alert(errData.message || '오류가 발생했습니다.');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('오류가 발생했습니다.');
+        }
+    };
+
+    if (!product) return <div className="container">Loading...</div>;
+
+    return (
+        <div className="container product-detail-container">
+            <div className="product-detail-hero">
+                <div className="product-detail-image-section">
+                    <div className="product-detail-image">
+                        {mainImage ? (
+                            <img src={mainImage} alt={product.name} />
+                        ) : (
+                            <div className="no-image">No Image</div>
+                        )}
+                    </div>
+                    {product.imageUrls && product.imageUrls.length > 1 && (
+                        <div className="product-thumbnails" style={{ display: 'flex', gap: '10px', marginTop: '10px', overflowX: 'auto' }}>
+                            {product.imageUrls.map((url, idx) => (
+                                <img
+                                    key={idx}
+                                    src={url}
+                                    alt={`${product.name} - ${idx}`}
+                                    style={{ width: '80px', height: '80px', objectFit: 'cover', cursor: 'pointer', border: mainImage === url ? '2px solid #000' : '1px solid #ccc' }}
+                                    onClick={() => setMainImage(url)}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div className="product-detail-info">
+                    <h2>{product.name}</h2>
+                    <div className="product-detail-price">{product.price.toLocaleString()}원</div>
+
+                    <div className="product-detail-options">
+                        {product.type === 'RENTAL' && (
+                            <div className="rental-options">
+                                <label>대여 일정</label>
+                                <div className="date-inputs">
+                                    <input type="date" value={rentalStartDate} onChange={e => setRentalStartDate(e.target.value)} />
+                                    <span> ~ </span>
+                                    <input type="date" value={rentalEndDate} onChange={e => setRentalEndDate(e.target.value)} />
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="quantity-option">
+                            <label>수량</label>
+                            <div className="quantity-controls">
+                                <button onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
+                                <span>{quantity}</span>
+                                <button onClick={() => setQuantity(q => q + 1)}>+</button>
+                            </div>
+                        </div>
+
+                        <div className="total-price">
+                            총 {(product.price * quantity).toLocaleString()}원
+                        </div>
+
+                        <div className="action-buttons">
+                            <button className="add-cart-btn" onClick={handleAddToCart}>장바구니 담기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="product-detail-description">
+                <h3>상품 설명</h3>
+                <div className="description-content" dangerouslySetInnerHTML={{ __html: product.description }} />
+            </div>
+        </div>
+    );
+};
+
+export default ProductDetail;

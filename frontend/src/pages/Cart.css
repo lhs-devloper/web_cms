@@ -1,0 +1,146 @@
+.cart-container {
+    padding: 40px 20px;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 50px;
+    background: var(--bg-card);
+    border-radius: 8px;
+}
+
+.empty-cart p {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.btn-continue,
+.btn-checkout {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #34495e;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.cart-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cart-table th,
+.cart-table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}
+
+.cart-table th {
+    background: #f9f9f9;
+}
+
+.cart-item-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-align: left !important;
+}
+
+.cart-item-info img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.cart-item-info .badge {
+    display: inline-block;
+    font-size: 0.8rem;
+    background: #eee;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+.item-name {
+    display: block;
+    font-weight: bold;
+    color: inherit;
+    text-decoration: none;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.quantity-control button {
+    width: 30px;
+    height: 30px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.rental-dates {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 5px;
+}
+
+.btn-delete {
+    background: transparent;
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.cart-summary {
+    background: #f9f9f9;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: right;
+    margin-top: 20px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 50px;
+    margin-bottom: 10px;
+    color: #666;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: flex-end;
+    gap: 50px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.btn-checkout {
+    width: 100%;
+    max-width: 300px;
+    font-size: 1.2rem;
+    padding: 15px;
+    border: none;
+    cursor: pointer;
+}
