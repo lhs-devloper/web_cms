@@ -27,7 +27,7 @@ const BoardList = () => {
                 const headers: any = {};
                 if (token) headers['Authorization'] = `Bearer ${token}`;
 
-                const res = await fetch(`http://${window.location.hostname}:8080/api/board/${boardId}`, { headers });
+                const res = await fetch(`/api/board/${boardId}`, { headers });
                 if (res.ok) {
                     const data = await res.json();
                     setBoardInfo(data.board);

@@ -23,7 +23,7 @@ const AdminLayout = () => {
                 return;
             }
             try {
-                const res = await fetch(`http://${window.location.hostname}:8080/api/profile`, {
+                const res = await fetch(`/api/profile`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (res.ok) {

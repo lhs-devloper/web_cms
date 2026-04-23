@@ -24,7 +24,7 @@ const StoryDetail = () => {
     useEffect(() => {
         const fetchStory = async () => {
             try {
-                const res = await fetch(`http://${window.location.hostname}:8080/api/stories/${id}`);
+                const res = await fetch(`/api/stories/${id}`);
                 if (res.ok) {
                     const data = await res.json();
                     setStory(data);

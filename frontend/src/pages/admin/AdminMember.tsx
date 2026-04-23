@@ -24,7 +24,7 @@ const AdminMember = () => {
             if (keyword) params.append('keyword', keyword);
             if (selectedRole) params.append('role', selectedRole);
 
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/user?${params.toString()}`);
+            const res = await fetch(`/api/admin/user?${params.toString()}`);
             const data = await res.json();
             if (data.users) setUsers(data.users);
             if (data.roles) setRoles(data.roles);
@@ -52,7 +52,7 @@ const AdminMember = () => {
             formData.append('id', id.toString());
             formData.append('role', newRole);
 
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/user/update-role`, {
+            const res = await fetch(`/api/admin/user/update-role`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: formData.toString()
@@ -76,7 +76,7 @@ const AdminMember = () => {
             const formData = new URLSearchParams();
             formData.append('id', id.toString());
 
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/user/delete`, {
+            const res = await fetch(`/api/admin/user/delete`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: formData.toString()
@@ -94,7 +94,7 @@ const AdminMember = () => {
 
     const getProfileImg = (picture: string | null) => {
         if (!picture) return 'https://via.placeholder.com/150';
-        return picture.startsWith('http') ? picture : `http://${window.location.hostname}:8080${picture}`;
+        return picture.startsWith('http') ? picture : `${picture}`;
     };
 
     return (

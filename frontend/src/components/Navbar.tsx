@@ -32,7 +32,7 @@ const Navbar = () => {
     useEffect(() => {
         const fetchMenus = async () => {
             try {
-                const res = await fetch(`http://${window.location.hostname}:8080/api/global/menus`);
+                const res = await fetch(`/api/global/menus`);
                 if (res.ok) {
                     const data = await res.json();
                     setMenus(data);
@@ -46,7 +46,7 @@ const Navbar = () => {
 
     const getImageUrl = (url?: string) => {
         if (!url) return '';
-        return url.startsWith('http') ? url : `http://${window.location.hostname}:8080${url}`;
+        return url.startsWith('http') ? url : `${url}`;
     };
 
     return (

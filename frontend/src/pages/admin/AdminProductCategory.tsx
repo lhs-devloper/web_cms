@@ -28,7 +28,7 @@ const AdminProductCategory: React.FC = () => {
         sortOrder: 0
     });
 
-    const API_BASE = `http://${window.location.hostname}:8080/api/admin/product-categories`;
+    const API_BASE = `/api/admin/product-categories`;
 
     useEffect(() => {
         fetchCategories();

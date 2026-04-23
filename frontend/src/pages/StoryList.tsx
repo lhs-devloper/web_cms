@@ -28,7 +28,7 @@ export const StoryListContent = ({ setting, stories }: { setting: any; stories: 
 
     const getImageUrl = (url: string) => {
         if (!url) return '';
-        return url.startsWith('http') ? url : `http://${window.location.hostname}:8080${url}`;
+        return url.startsWith('http') ? url : `${url}`;
     };
 
     return (
@@ -77,7 +77,7 @@ const StoryList = () => {
     useEffect(() => {
         const fetchStories = async () => {
             try {
-                const res = await fetch(`http://${window.location.hostname}:8080/api/stories`);
+                const res = await fetch(`/api/stories`);
                 if (res.ok) {
                     const data = await res.json();
                     setStories(data);

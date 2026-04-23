@@ -39,7 +39,7 @@ const AdminMembership = () => {
             const headers: any = {};
             if (token) headers['Authorization'] = `Bearer ${token}`;
 
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/membership/grades`, { headers });
+            const res = await fetch(`/api/admin/membership/grades`, { headers });
             if (res.ok) {
                 setGrades(await res.json());
             }
@@ -97,8 +97,8 @@ const AdminMembership = () => {
             if (token) headers['Authorization'] = `Bearer ${token}`;
 
             const url = editingId
-                ? `http://${window.location.hostname}:8080/api/admin/membership/grades/${editingId}`
-                : `http://${window.location.hostname}:8080/api/admin/membership/grades`;
+                ? `/api/admin/membership/grades/${editingId}`
+                : `/api/admin/membership/grades`;
 
             const res = await fetch(url, {
                 method: editingId ? 'PUT' : 'POST',
@@ -125,7 +125,7 @@ const AdminMembership = () => {
             const headers: any = {};
             if (token) headers['Authorization'] = `Bearer ${token}`;
 
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/membership/grades/${id}`, {
+            const res = await fetch(`/api/admin/membership/grades/${id}`, {
                 method: 'DELETE',
                 headers
             });

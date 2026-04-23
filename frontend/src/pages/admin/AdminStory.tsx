@@ -65,7 +65,7 @@ const AdminStory = () => {
     const fetchSetting = async () => {
         try {
             setSettingLoading(true);
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/setting`);
+            const res = await fetch(`/api/admin/setting`);
             if (res.ok) {
                 const data = await res.json();
                 if (data) {
@@ -86,7 +86,7 @@ const AdminStory = () => {
     // ── Fetch stories ──
     const fetchStories = async () => {
         try {
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/stories`);
+            const res = await fetch(`/api/admin/stories`);
             if (res.ok) {
                 const data = await res.json();
                 setStories(data);
@@ -117,7 +117,7 @@ const AdminStory = () => {
         setSettingSaving(true);
 
         try {
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/setting/save`, {
+            const res = await fetch(`/api/admin/setting/save`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(pageSetting)
@@ -163,7 +163,7 @@ const AdminStory = () => {
 
     const getImageUrl = (url: string) => {
         if (!url) return '';
-        return url.startsWith('http') ? url : `http://${window.location.hostname}:8080${url}`;
+        return url.startsWith('http') ? url : `${url}`;
     };
 
     const openFormNew = () => {
@@ -205,7 +205,7 @@ const AdminStory = () => {
             if (thumbnailFile) {
                 const fd = new FormData();
                 fd.append('file', thumbnailFile);
-                const uploadRes = await fetch(`http://${window.location.hostname}:8080/api/files/upload`, {
+                const uploadRes = await fetch(`/api/files/upload`, {
                     method: 'POST',
                     body: fd
                 });
@@ -221,14 +221,14 @@ const AdminStory = () => {
             const payload = { ...formData, thumbnailUrl: finalThumbnailUrl };
 
             if (editingId) {
-                const res = await fetch(`http://${window.location.hostname}:8080/api/admin/stories/${editingId}`, {
+                const res = await fetch(`/api/admin/stories/${editingId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
                 if (!res.ok) throw new Error('수정 실패');
             } else {
-                const res = await fetch(`http://${window.location.hostname}:8080/api/admin/stories`, {
+                const res = await fetch(`/api/admin/stories`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -247,7 +247,7 @@ const AdminStory = () => {
     const handleDelete = async (id: number) => {
         if (!confirm('정말 삭제하시겠습니까?')) return;
         try {
-            await fetch(`http://${window.location.hostname}:8080/api/admin/stories/${id}`, { method: 'DELETE' });
+            await fetch(`/api/admin/stories/${id}`, { method: 'DELETE' });
             fetchStories();
         } catch (err) {
             console.error(err);
@@ -277,7 +277,7 @@ const AdminStory = () => {
                 fd.append('file', file);
 
                 try {
-                    const res = await fetch(`http://${window.location.hostname}:8080/api/files/upload`, {
+                    const res = await fetch(`/api/files/upload`, {
                         method: 'POST',
                         body: fd
                     });

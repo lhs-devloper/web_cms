@@ -155,7 +155,7 @@ const OrderHistory = () => {
                                     </div>
                                 </div>
                                 <div className="order-card-body">
-                                    <img src={order.orderItems && order.orderItems.length > 0 && order.orderItems[0].imageUrl ? (order.orderItems[0].imageUrl.startsWith('http') ? order.orderItems[0].imageUrl : `http://${window.location.hostname}:8080${order.orderItems[0].imageUrl}`) : "https://via.placeholder.com/150?text=Product"} alt="Order" className="order-image" />
+                                    <img src={order.orderItems && order.orderItems.length > 0 && order.orderItems[0].imageUrl ? (order.orderItems[0].imageUrl.startsWith('http') ? order.orderItems[0].imageUrl : `${order.orderItems[0].imageUrl}`) : "https://via.placeholder.com/150?text=Product"} alt="Order" className="order-image" />
                                     <div className="order-info">
                                         <h4>
                                             {order.orderItems && order.orderItems.length > 0 ? (
@@ -229,7 +229,7 @@ const OrderHistory = () => {
                                 <div className="modal-items-list">
                                     {selectedOrder.orderItems?.map((item: any) => (
                                         <div className="modal-item" key={item.id}>
-                                            <img src={item.imageUrl ? (item.imageUrl.startsWith('http') ? item.imageUrl : `http://${window.location.hostname}:8080${item.imageUrl}`) : "https://via.placeholder.com/80?text=Product"} alt={item.productName} />
+                                            <img src={item.imageUrl ? (item.imageUrl.startsWith('http') ? item.imageUrl : `${item.imageUrl}`) : "https://via.placeholder.com/80?text=Product"} alt={item.productName} />
                                             <div className="modal-item-info">
                                                 <p className="modal-item-name">{item.productName}</p>
                                                 <p className="modal-item-qty">{item.price.toLocaleString()}원 x {item.quantity}개</p>

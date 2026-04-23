@@ -31,7 +31,7 @@ const Hero = () => {
     useEffect(() => {
         const fetchBanners = async () => {
             try {
-                const res = await fetch(`http://${window.location.hostname}:8080/api/global/banners`);
+                const res = await fetch(`/api/global/banners`);
                 if (res.ok) {
                     const data = await res.json();
                     if (data && data.length > 0) {
@@ -89,7 +89,7 @@ const Hero = () => {
     return (
         <section className="hero-section">
             {banners.map((currentBanner, index) => {
-                const bgUrl = currentBanner.imageUrl?.startsWith('http') ? currentBanner.imageUrl : `http://${window.location.hostname}:8080${currentBanner.imageUrl}`;
+                const bgUrl = currentBanner.imageUrl?.startsWith('http') ? currentBanner.imageUrl : `${currentBanner.imageUrl}`;
                 const isActive = index === currentIndex;
 
                 return (

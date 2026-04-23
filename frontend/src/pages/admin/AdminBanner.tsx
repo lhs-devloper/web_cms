@@ -50,7 +50,7 @@ const AdminBanner = () => {
 
     const fetchBanners = async () => {
         try {
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/banners`);
+            const res = await fetch(`/api/admin/banners`);
             const data = await res.json();
             if (data.banners) {
                 // Parse buttonsJson to use in frontend
@@ -149,7 +149,7 @@ const AdminBanner = () => {
         }
 
         try {
-            const url = `http://${window.location.hostname}:8080/api/admin/banners/save`;
+            const url = `/api/admin/banners/save`;
             const res = await fetch(url, {
                 method: 'POST',
                 body: formData
@@ -173,7 +173,7 @@ const AdminBanner = () => {
     const handleDelete = async (id: number) => {
         if (!confirm('정말 삭제하시겠습니까?')) return;
         try {
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/banners/delete?id=${id}`, { method: 'POST' });
+            const res = await fetch(`/api/admin/banners/delete?id=${id}`, { method: 'POST' });
             if (res.ok) fetchBanners();
         } catch (error) {
             console.error(error);
@@ -191,7 +191,7 @@ const AdminBanner = () => {
                 {banners.map(banner => (
                     <div className="banner-card" key={banner.id}>
                         <div className="banner-img">
-                            <img src={banner.imageUrl?.startsWith('http') ? banner.imageUrl : `http://${window.location.hostname}:8080${banner.imageUrl}`} alt={banner.title} />
+                            <img src={banner.imageUrl?.startsWith('http') ? banner.imageUrl : `${banner.imageUrl}`} alt={banner.title} />
                         </div>
                         <div className="banner-details">
                             <h4>{banner.title}</h4>
@@ -337,7 +337,7 @@ const AdminBanner = () => {
                                     <div className="preview-container">
                                         <div className="preview-bg">
                                             <img
-                                                src={selectedFile ? URL.createObjectURL(selectedFile) : (currentBanner.imageUrl?.startsWith('http') ? currentBanner.imageUrl : `http://${window.location.hostname}:8080${currentBanner.imageUrl || '/placeholder.jpg'}`)}
+                                                src={selectedFile ? URL.createObjectURL(selectedFile) : (currentBanner.imageUrl?.startsWith('http') ? currentBanner.imageUrl : `${currentBanner.imageUrl || '/placeholder.jpg'}`)}
                                                 alt="preview"
                                             />
                                             <div className="preview-overlay"></div>

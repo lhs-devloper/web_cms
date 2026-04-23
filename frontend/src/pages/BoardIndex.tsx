@@ -15,7 +15,7 @@ const BoardIndex = () => {
     useEffect(() => {
         const fetchBoards = async () => {
             try {
-                const res = await fetch(`http://${window.location.hostname}:8080/api/board`);
+                const res = await fetch(`/api/board`);
                 if (res.ok) {
                     const data = await res.json();
                     setBoards(data);

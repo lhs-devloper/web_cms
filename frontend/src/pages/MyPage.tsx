@@ -37,7 +37,7 @@ const MyPage = () => {
             }
 
             try {
-                const response = await fetch(`http://${window.location.hostname}:8080/api/profile`, {
+                const response = await fetch(`/api/profile`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -47,7 +47,7 @@ const MyPage = () => {
                     const data = await response.json();
                     const picture = data.user.picture;
                     const profileImageUrl = picture
-                        ? (picture.startsWith('http') ? picture : `http://${window.location.hostname}:8080${picture}`)
+                        ? (picture.startsWith('http') ? picture : `${picture}`)
                         : 'https://via.placeholder.com/150';
 
                     setUser({
@@ -93,7 +93,7 @@ const MyPage = () => {
             const token = localStorage.getItem('accessToken');
             if (!token) return;
             try {
-                const res = await fetch(`http://${window.location.hostname}:8080/api/membership/my`, {
+                const res = await fetch(`/api/membership/my`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (res.ok) setMembership(await res.json());
@@ -218,7 +218,7 @@ const MyPage = () => {
 
         try {
             const token = localStorage.getItem('accessToken');
-            const response = await fetch(`http://${window.location.hostname}:8080/api/profile/update`, {
+            const response = await fetch(`/api/profile/update`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -267,7 +267,7 @@ const MyPage = () => {
 
         try {
             const token = localStorage.getItem('accessToken');
-            const response = await fetch(`http://${window.location.hostname}:8080/api/profile/update`, {
+            const response = await fetch(`/api/profile/update`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData
@@ -298,7 +298,7 @@ const MyPage = () => {
 
         try {
             const token = localStorage.getItem('accessToken');
-            const response = await fetch('http://localhost:8080/api/profile/password', {
+            const response = await fetch('/api/profile/password', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData
@@ -418,7 +418,7 @@ const MyPage = () => {
                                         key={order.id}
                                         onClick={() => order.status === 'PENDING' && openRetryModal(order)}
                                     >
-                                        <img src={order.orderItems && order.orderItems.length > 0 && order.orderItems[0].imageUrl ? (order.orderItems[0].imageUrl.startsWith('http') ? order.orderItems[0].imageUrl : `http://${window.location.hostname}:8080${order.orderItems[0].imageUrl}`) : "https://via.placeholder.com/100?text=Order"} alt="product" />
+                                        <img src={order.orderItems && order.orderItems.length > 0 && order.orderItems[0].imageUrl ? (order.orderItems[0].imageUrl.startsWith('http') ? order.orderItems[0].imageUrl : `${order.orderItems[0].imageUrl}`) : "https://via.placeholder.com/100?text=Order"} alt="product" />
                                         <div className="order-details">
                                             <span className="order-date">{new Date(order.createdAt).toLocaleDateString()}</span>
                                             <h4>

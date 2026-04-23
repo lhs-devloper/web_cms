@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, AlertCircle, CreditCard } from 'lucide-react';
+import { Save, AlertCircle, CreditCard, Eye, EyeOff } from 'lucide-react';
 import './AdminSetting.css';
 
 interface PaymentConfig {
@@ -40,11 +40,16 @@ const AdminPaymentSetting = () => {
     const [loading, setLoading] = useState(false);
     const [savingId, setSavingId] = useState<number | null>(null);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+    const [visibleSecrets, setVisibleSecrets] = useState<Record<string, boolean>>({});
+
+    const toggleSecret = (key: string) => {
+        setVisibleSecrets(prev => ({ ...prev, [key]: !prev[key] }));
+    };
 
     const fetchPayments = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/payment`);
+            const res = await fetch(`/api/admin/payment`);
             if (res.ok) {
                 const data = await res.json();
                 if (data && data.payments) {
@@ -76,7 +81,7 @@ const AdminPaymentSetting = () => {
                 isActive: payment.active
             };
             const pgPath = payment.provider.toLowerCase();
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/payment/${pgPath}/save`, {
+            const res = await fetch(`/api/admin/payment/${pgPath}/save`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

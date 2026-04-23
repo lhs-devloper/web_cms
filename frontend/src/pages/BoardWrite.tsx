@@ -52,7 +52,7 @@ const BoardWrite = () => {
             const headers: any = {};
             if (token) headers['Authorization'] = `Bearer ${token}`;
 
-            fetch(`http://${window.location.hostname}:8080/api/board/${boardId}/view/${id}`, { headers })
+            fetch(`/api/board/${boardId}/view/${id}`, { headers })
                 .then(res => res.json())
                 .then(data => {
                     if (data && data.post) {
@@ -99,8 +99,8 @@ const BoardWrite = () => {
         }
 
         const endpoint = id
-            ? `http://${window.location.hostname}:8080/api/board/${boardId}/update`
-            : `http://${window.location.hostname}:8080/api/board/${boardId}/save`;
+            ? `/api/board/${boardId}/update`
+            : `/api/board/${boardId}/save`;
 
         try {
             const res = await fetch(endpoint, {

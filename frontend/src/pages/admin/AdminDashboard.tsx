@@ -34,15 +34,15 @@ const AdminDashboard = () => {
                 if (token) headers['Authorization'] = `Bearer ${token}`;
 
                 // 요약 통계
-                const summaryRes = await fetch(`http://${window.location.hostname}:8080/api/admin/stats/summary`, { headers });
+                const summaryRes = await fetch(`/api/admin/stats/summary`, { headers });
                 if (summaryRes.ok) setSummary(await summaryRes.json());
 
                 // 대시보드 데이터 (최근 게시글 등)
-                const dashRes = await fetch(`http://${window.location.hostname}:8080/api/admin`, { headers });
+                const dashRes = await fetch(`/api/admin`, { headers });
                 if (dashRes.ok) setDashData(await dashRes.json());
 
                 // 최근 활동 로그 (5건)
-                const logRes = await fetch(`http://${window.location.hostname}:8080/api/admin/stats/activity-log?page=0&size=5`, { headers });
+                const logRes = await fetch(`/api/admin/stats/activity-log?page=0&size=5`, { headers });
                 if (logRes.ok) {
                     const logData = await logRes.json();
                     setActivityLogs(logData.content || []);

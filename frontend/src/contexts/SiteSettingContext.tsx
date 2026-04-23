@@ -46,7 +46,7 @@ export const SiteSettingProvider: React.FC<{ children: React.ReactNode }> = ({ c
     useEffect(() => {
         const fetchSetting = async () => {
             try {
-                const res = await fetch(`http://${window.location.hostname}:8080/api/global/setting`);
+                const res = await fetch(`/api/global/setting`);
                 if (res.ok) {
                     const data = await res.json();
                     setSetting(data);
@@ -98,7 +98,7 @@ export const SiteSettingProvider: React.FC<{ children: React.ReactNode }> = ({ c
                             ogImage.setAttribute('property', 'og:image');
                             document.head.appendChild(ogImage);
                         }
-                        const imageUrl = data.ogImage.startsWith('http') ? data.ogImage : `http://${window.location.hostname}:8080${data.ogImage}`;
+                        const imageUrl = data.ogImage.startsWith('http') ? data.ogImage : `${data.ogImage}`;
                         ogImage.setAttribute('content', imageUrl);
                     }
                     if (data.canonicalUrl) {

@@ -41,7 +41,7 @@ const AdminActivityLog = () => {
             if (endDate) params.append('endDate', endDate);
             if (ip) params.append('ip', ip);
 
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/stats/activity-log?${params.toString()}`, { headers });
+            const res = await fetch(`/api/admin/stats/activity-log?${params.toString()}`, { headers });
             if (res.ok) {
                 const data: PageData = await res.json();
                 setLogs(data.content || []);

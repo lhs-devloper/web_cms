@@ -47,7 +47,7 @@ const AdminSetting = () => {
     const fetchSetting = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/setting`);
+            const res = await fetch(`/api/admin/setting`);
             if (res.ok) {
                 const data = await res.json();
                 if (data) {
@@ -85,7 +85,7 @@ const AdminSetting = () => {
             });
 
             // Make sure the API exists to save (e.g. POST /api/admin/setting/save)
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/setting/save`, {
+            const res = await fetch(`/api/admin/setting/save`, {
                 method: 'POST',
                 // Spring Boot form data or JSON depending on backend implementation.
                 // If it expects form-data:
@@ -125,7 +125,7 @@ const AdminSetting = () => {
             const formData = new FormData();
             formData.append('file', file);
 
-            const res = await fetch(`http://${window.location.hostname}:8080/api/files/upload`, {
+            const res = await fetch(`/api/files/upload`, {
                 method: 'POST',
                 body: formData
             });
@@ -153,7 +153,7 @@ const AdminSetting = () => {
 
     const getImageUrl = (url: string) => {
         if (!url) return '';
-        return url.startsWith('http') ? url : `http://${window.location.hostname}:8080${url}`;
+        return url.startsWith('http') ? url : `${url}`;
     };
 
     if (loading) {

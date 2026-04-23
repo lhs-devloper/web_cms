@@ -50,7 +50,7 @@ const AdminProducts: React.FC = () => {
 
     const fetchCategories = async () => {
         try {
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/product-categories`);
+            const res = await fetch(`/api/admin/product-categories`);
             if (res.ok) setCategories(await res.json());
         } catch (err) {
             console.error(err);

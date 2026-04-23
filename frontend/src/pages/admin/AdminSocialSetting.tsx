@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, AlertCircle, Key } from 'lucide-react';
+import { Save, AlertCircle, Key, Eye, EyeOff } from 'lucide-react';
 import './AdminSetting.css';
 
 interface SocialConfig {
@@ -36,11 +36,16 @@ const AdminSocialSetting = () => {
     const [loading, setLoading] = useState(false);
     const [savingId, setSavingId] = useState<number | null>(null);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+    const [visibleSecrets, setVisibleSecrets] = useState<Record<string, boolean>>({});
+
+    const toggleSecret = (key: string) => {
+        setVisibleSecrets(prev => ({ ...prev, [key]: !prev[key] }));
+    };
 
     const fetchSocials = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/social`);
+            const res = await fetch(`/api/admin/social`);
             if (res.ok) {
                 const data = await res.json();
                 if (data && data.socials) {
@@ -72,7 +77,7 @@ const AdminSocialSetting = () => {
                 isActive: social.active
             };
 
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/social/save`, {
+            const res = await fetch(`/api/admin/social/save`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -145,13 +150,19 @@ const AdminSocialSetting = () => {
 
                         <div className="form-group">
                             <label>Client Secret (시크릿 키)</label>
-                            <input
-                                type="text"
-                                value={social.clientSecret || ''}
-                                onChange={(e) => handleChange(social.id, 'clientSecret', e.target.value)}
-                                className="form-control"
-                                placeholder="Client Secret 입력"
-                            />
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type={visibleSecrets[`secret-${social.id}`] ? 'text' : 'password'}
+                                    value={social.clientSecret || ''}
+                                    onChange={(e) => handleChange(social.id, 'clientSecret', e.target.value)}
+                                    className="form-control"
+                                    placeholder="Client Secret 입력"
+                                    style={{ paddingRight: '2.5rem' }}
+                                />
+                                <button type="button" onClick={() => toggleSecret(`secret-${social.id}`)} style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0.3rem' }}>
+                                    {visibleSecrets[`secret-${social.id}`] ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
                         </div>
 
                         <div className="form-group">

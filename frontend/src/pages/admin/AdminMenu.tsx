@@ -43,7 +43,7 @@ const AdminMenu = () => {
 
     const fetchMenus = async () => {
         try {
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/menus`);
+            const res = await fetch(`/api/admin/menus`);
             const data = await res.json();
             if (data.menus) {
                 setMenus(data.menus);
@@ -55,7 +55,7 @@ const AdminMenu = () => {
 
     const fetchBoards = async () => {
         try {
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/board`);
+            const res = await fetch(`/api/admin/board`);
             if (res.ok) {
                 const data = await res.json();
                 const boards: UrlOption[] = (data.boards || []).map((b: any) => ({
@@ -111,7 +111,7 @@ const AdminMenu = () => {
         setLoading(true);
 
         try {
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/menus/save`, {
+            const res = await fetch(`/api/admin/menus/save`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(currentMenu)
@@ -135,7 +135,7 @@ const AdminMenu = () => {
     const handleDelete = async (id: number) => {
         if (!confirm('정말 삭제하시겠습니까? (서브메뉴가 있는 메인메뉴 삭제 시 서브메뉴가 고아 데이터가 될 수 있습니다)')) return;
         try {
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/menus/delete?id=${id}`, { method: 'POST' });
+            const res = await fetch(`/api/admin/menus/delete?id=${id}`, { method: 'POST' });
             if (res.ok) fetchMenus();
         } catch (error) {
             console.error(error);
@@ -223,7 +223,7 @@ const AdminMenu = () => {
         });
 
         try {
-            await fetch(`http://${window.location.hostname}:8080/api/admin/menus/reorder`, {
+            await fetch(`/api/admin/menus/reorder`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(flattenedIds)

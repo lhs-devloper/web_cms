@@ -19,7 +19,7 @@ const BoardView = () => {
                 const headers: any = {};
                 if (token) headers['Authorization'] = `Bearer ${token}`;
 
-                const res = await fetch(`http://${window.location.hostname}:8080/api/board/${boardId}/view/${id}`, { headers });
+                const res = await fetch(`/api/board/${boardId}/view/${id}`, { headers });
                 if (res.ok) {
                     const data = await res.json();
                     setPost(data.post);
@@ -49,7 +49,7 @@ const BoardView = () => {
             const headers: any = { 'Content-Type': 'application/x-www-form-urlencoded' };
             if (token) headers['Authorization'] = `Bearer ${token}`;
 
-            const res = await fetch(`http://${window.location.hostname}:8080/api/board/${boardId}/delete`, {
+            const res = await fetch(`/api/board/${boardId}/delete`, {
                 method: 'POST',
                 headers,
                 body: new URLSearchParams({ id: id as string, password: passwordInput })

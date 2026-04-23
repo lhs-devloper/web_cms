@@ -27,7 +27,7 @@ const Membership = () => {
     useEffect(() => {
         const fetchGrades = async () => {
             try {
-                const res = await fetch(`http://${window.location.hostname}:8080/api/membership/grades`);
+                const res = await fetch(`/api/membership/grades`);
                 if (res.ok) {
                     setGrades(await res.json());
                 }
@@ -40,7 +40,7 @@ const Membership = () => {
             const token = localStorage.getItem('accessToken');
             if (!token) return;
             try {
-                const res = await fetch(`http://${window.location.hostname}:8080/api/membership/my`, {
+                const res = await fetch(`/api/membership/my`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (res.ok) {

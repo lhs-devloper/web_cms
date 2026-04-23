@@ -36,6 +36,7 @@ import AdminActivityLog from './pages/admin/AdminActivityLog';
 import AdminOrder from './pages/admin/AdminOrder';
 import AdminMembership from './pages/admin/AdminMembership';
 import Membership from './pages/Membership';
+import Setup from './pages/Setup';
 import { SiteSettingProvider } from './contexts/SiteSettingContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { useState, useEffect } from 'react';
@@ -43,15 +44,17 @@ import './App.css';
 
 function App() {
   const [ready, setReady] = useState(false);
+  const [needsSetup, setNeedsSetup] = useState(false);
 
   useEffect(() => {
     const checkAdmin = async () => {
       try {
-        const res = await fetch(`http://${window.location.hostname}:8080/api/setup/check`);
+        const res = await fetch('/api/setup/check');
         if (res.ok) {
           const data = await res.json();
           if (!data.hasAdmin) {
-            window.location.href = `http://${window.location.hostname}:8080`;
+            setNeedsSetup(true);
+            setReady(true);
             return;
           }
         }
@@ -64,6 +67,10 @@ function App() {
   }, []);
 
   if (!ready) return null;
+
+  if (needsSetup) {
+    return <Setup onComplete={() => setNeedsSetup(false)} />;
+  }
 
   return (
     <ThemeProvider>

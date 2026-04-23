@@ -227,23 +227,7 @@ nohup java -jar build/libs/cmsproject-0.0.1-SNAPSHOT.jar \
 tail -f /var/log/cmsproject/app.log
 ```
 
-### 7단계: 초기 관리자 설정
-
-백엔드 서버 시작 후 **초기 설정 페이지**가 표시됩니다.
-
-1. 브라우저에서 `http://서버IP:8080` 접속
-2. 관리자 이름, 이메일, 비밀번호 입력
-3. "관리자 계정 생성" 클릭
-4. 설정 완료 후 프론트엔드 배포 진행
-
-> **중요:** 관리자 계정이 생성되기 전에는 프론트엔드가 자동으로 백엔드 초기 설정 페이지로 리다이렉트됩니다.
-
-| Method | URL | 설명 |
-|--------|-----|------|
-| GET | `/api/setup/check` | 관리자 존재 여부 확인 |
-| POST | `/api/setup/init` | 초기 관리자 생성 (관리자 없을 때만) |
-
-### 8단계: Frontend 빌드
+### 7단계: Frontend 빌드
 
 ```bash
 cd /opt/cmsproject/frontend
@@ -255,6 +239,22 @@ npm install
 npm run build
 # 빌드 결과물: frontend/dist/
 ```
+
+### 8단계: 초기 관리자 설정
+
+배포 완료 후 사이트에 최초 접속하면 **프론트엔드에서 초기 설정 페이지**가 자동으로 표시됩니다.
+
+1. 브라우저에서 `http://your-domain.com` 접속
+2. 관리자 이름, 이메일, 비밀번호 입력
+3. "관리자 계정 생성" 클릭
+4. 자동으로 메인 페이지로 이동
+
+> **참고:** 프론트엔드가 `/api/setup/check`를 호출하여 관리자 존재 여부를 확인합니다. 관리자가 없으면 React 내에서 설정 페이지를 표시하므로 별도의 백엔드 접속이 필요 없습니다.
+
+| Method | URL | 설명 |
+|--------|-----|------|
+| GET | `/api/setup/check` | 관리자 존재 여부 확인 |
+| POST | `/api/setup/init` | 초기 관리자 생성 (관리자 없을 때만) |
 
 ### 9단계: Nginx 설정
 
@@ -337,6 +337,7 @@ sudo systemctl reload nginx
 ```
 
 ### 10단계: HTTPS 설정 (선택, 권장)
+
 
 ```bash
 # Certbot 설치

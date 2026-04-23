@@ -26,7 +26,7 @@ const AdminBoards = () => {
     const fetchBoards = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/board`);
+            const res = await fetch(`/api/admin/board`);
             if (res.ok) {
                 const data = await res.json();
                 if (data.boards) {
@@ -54,7 +54,7 @@ const AdminBoards = () => {
 
     const handleEditClick = async (id: string) => {
         try {
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/board/edit/${id}`);
+            const res = await fetch(`/api/admin/board/edit/${id}`);
             if (res.ok) {
                 const data = await res.json();
                 if (data.board) {
@@ -77,7 +77,7 @@ const AdminBoards = () => {
             const formData = new URLSearchParams();
             formData.append('boardId', id);
 
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/board/delete`, {
+            const res = await fetch(`/api/admin/board/delete`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: formData.toString()
@@ -113,7 +113,7 @@ const AdminBoards = () => {
 
             const endpoint = isEditing ? 'update' : 'create';
 
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/board/${endpoint}`, {
+            const res = await fetch(`/api/admin/board/${endpoint}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: formData.toString()

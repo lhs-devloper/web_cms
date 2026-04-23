@@ -61,7 +61,7 @@ const AdminOrder = () => {
             const headers: any = {};
             if (token) headers['Authorization'] = `Bearer ${token}`;
 
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/orders`, { headers });
+            const res = await fetch(`/api/admin/orders`, { headers });
             if (res.ok) {
                 setOrders(await res.json());
             }
@@ -94,7 +94,7 @@ const AdminOrder = () => {
         if (!selectedOrder || !newStatus) return;
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/orders/${selectedOrder.id}/status`, {
+            const res = await fetch(`/api/admin/orders/${selectedOrder.id}/status`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ const AdminOrder = () => {
         if (!selectedOrder) return;
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/orders/${selectedOrder.id}/tracking`, {
+            const res = await fetch(`/api/admin/orders/${selectedOrder.id}/tracking`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -259,7 +259,7 @@ const AdminOrder = () => {
                                     marginBottom: '0.5rem'
                                 }}>
                                     <img
-                                        src={item.imageUrl ? (item.imageUrl.startsWith('http') ? item.imageUrl : `http://${window.location.hostname}:8080${item.imageUrl}`) : 'https://via.placeholder.com/60'}
+                                        src={item.imageUrl ? (item.imageUrl.startsWith('http') ? item.imageUrl : `${item.imageUrl}`) : 'https://via.placeholder.com/60'}
                                         alt={item.productName}
                                         style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '6px' }}
                                     />

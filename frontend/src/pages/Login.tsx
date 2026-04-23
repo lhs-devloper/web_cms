@@ -25,7 +25,7 @@ const Login = () => {
     useEffect(() => {
         const fetchSocialProviders = async () => {
             try {
-                const res = await fetch(`http://${window.location.hostname}:8080/api/global/social/active`);
+                const res = await fetch(`/api/global/social/active`);
                 if (res.ok) {
                     const data = await res.json();
                     setSocialProviders(data);
@@ -36,7 +36,7 @@ const Login = () => {
         };
         const fetchSiteSetting = async () => {
             try {
-                const res = await fetch(`http://${window.location.hostname}:8080/api/global/setting`);
+                const res = await fetch(`/api/global/setting`);
                 if (res.ok) setSiteSetting(await res.json());
             } catch (err) {
                 console.error('Failed to load site setting:', err);
@@ -50,7 +50,7 @@ const Login = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch(`http://${window.location.hostname}:8080/api/auth/login`, {
+            const response = await fetch(`/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
@@ -81,7 +81,7 @@ const Login = () => {
             <div className="login-box animate-fade-in">
                 <div className="login-header">
                     {siteSetting?.logoUrl ? (
-                        <img src={siteSetting.logoUrl.startsWith('http') ? siteSetting.logoUrl : `http://${window.location.hostname}:8080${siteSetting.logoUrl}`} alt={siteSetting?.logoAltText || 'Logo'} style={{ maxHeight: '48px', marginBottom: '0.5rem' }} />
+                        <img src={siteSetting.logoUrl.startsWith('http') ? siteSetting.logoUrl : `${siteSetting.logoUrl}`} alt={siteSetting?.logoAltText || 'Logo'} style={{ maxHeight: '48px', marginBottom: '0.5rem' }} />
                     ) : (
                         <h2>{siteSetting?.siteName || 'Lumière'}</h2>
                     )}
@@ -149,7 +149,7 @@ const Login = () => {
                                             key={provider.registrationId}
                                             type="button"
                                             className={`social-btn ${meta.className}`}
-                                            onClick={() => window.location.href = `http://${window.location.hostname}:8080/oauth2/authorization/${provider.registrationId}`}
+                                            onClick={() => window.location.href = `/oauth2/authorization/${provider.registrationId}`}
                                         >
                                             <img src={meta.icon} alt={meta.alt} />
                                         </button>

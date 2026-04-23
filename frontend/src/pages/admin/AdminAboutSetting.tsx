@@ -44,7 +44,7 @@ const AdminAboutSetting = () => {
     const fetchSetting = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/setting`);
+            const res = await fetch(`/api/admin/setting`);
             if (res.ok) {
                 const data = await res.json();
                 if (data) {
@@ -82,7 +82,7 @@ const AdminAboutSetting = () => {
         setSaving(true);
 
         try {
-            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/setting/save`, {
+            const res = await fetch(`/api/admin/setting/save`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(setting)
