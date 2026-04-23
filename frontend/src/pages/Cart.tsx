@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Trash2, Plus, Minus, CreditCard, ShoppingBag, Calendar, ShieldCheck } from 'lucide-react';
 import './Cart.css';
 
 interface CartItem {
@@ -16,6 +17,7 @@ interface CartItem {
 
 const Cart: React.FC = () => {
     const [items, setItems] = useState<CartItem[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -24,7 +26,10 @@ const Cart: React.FC = () => {
 
     const fetchCartItems = async () => {
         try {
-            const res = await fetch('/api/cart');
+            const token = localStorage.getItem('accessToken');
+            const res = await fetch('/api/cart', {
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            });
             if (res.status === 401) {
                 navigate('/login');
                 return;
@@ -33,6 +38,8 @@ const Cart: React.FC = () => {
             setItems(data);
         } catch (err) {
             console.error(err);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -42,7 +49,8 @@ const Cart: React.FC = () => {
             await fetch(`/api/cart/${id}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    ...(localStorage.getItem('accessToken') ? { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` } : {})
                 },
                 body: JSON.stringify({ quantity })
             });
@@ -53,9 +61,11 @@ const Cart: React.FC = () => {
     };
 
     const removeItem = async (id: number) => {
+        if (!confirm('장바구니에서 삭제하시겠습니까?')) return;
         try {
             await fetch(`/api/cart/${id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: localStorage.getItem('accessToken') ? { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` } : {}
             });
             fetchCartItems();
         } catch (err) {
@@ -67,69 +77,118 @@ const Cart: React.FC = () => {
         return items.reduce((sum, item) => sum + (item.productPrice * item.quantity), 0);
     };
 
+    if (isLoading) {
+        return <div className="container" style={{ padding: '40px 20px', textAlign: 'center' }}>불러오는 중...</div>;
+    }
+
     return (
         <div className="container cart-container">
-            <h2>장바구니</h2>
+            <div className="cart-header">
+                <h2>나의 장바구니</h2>
+            </div>
 
             {items.length === 0 ? (
                 <div className="empty-cart">
-                    <p>장바구니가 비어있습니다.</p>
-                    <Link to="/products" className="btn-continue">쇼핑 계속하기</Link>
+                    <ShoppingBag size={64} className="empty-cart-icon" />
+                    <p>장바구니에 담긴 상품이 없습니다.</p>
+                    <Link to="/products" className="btn-continue">
+                        쇼핑 계속하기
+                    </Link>
                 </div>
             ) : (
-                <div className="cart-content">
-                    <table className="cart-table">
-                        <thead>
-                            <tr>
-                                <th>상품정보</th>
-                                <th>수량/일정</th>
-                                <th>금액</th>
-                                <th>관리</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {items.map(item => (
-                                <tr key={item.id}>
-                                    <td className="cart-item-info">
-                                        <img src={item.imageUrl || 'https://via.placeholder.com/80'} alt={item.productName} />
+                <div className="cart-layout">
+                    <div className="cart-main">
+                        {items.map(item => (
+                            <div className="cart-item-card" key={item.id}>
+                                <img src={item.imageUrl || 'https://via.placeholder.com/200'} alt={item.productName} className="cart-item-image" />
+                                
+                                <div className="cart-item-details">
+                                    <div className="cart-item-header">
                                         <div>
-                                            <span className="badge">{item.productType === 'NORMAL' ? '일반' : '대여'}</span>
-                                            <Link to={`/products/${item.productId}`} className="item-name">{item.productName}</Link>
+                                            <span className={`badge ${item.productType === 'RENTAL' ? 'rental' : ''}`}>
+                                                {item.productType}
+                                            </span>
+                                            <Link to={`/products/${item.productId}`} className="cart-item-name">
+                                                {item.productName}
+                                            </Link>
                                         </div>
-                                    </td>
-                                    <td className="cart-item-details">
-                                        <div className="quantity-control">
-                                            <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
-                                            <span>{item.quantity}</span>
-                                            <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
-                                        </div>
-                                        {item.productType === 'RENTAL' && item.rentalStartDate && (
+                                        <button onClick={() => removeItem(item.id)} className="btn-delete-item" aria-label="삭제">
+                                            <Trash2 size={20} />
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="cart-item-meta">
+                                        {item.rentalStartDate && item.rentalEndDate && (
                                             <div className="rental-dates">
-                                                {item.rentalStartDate} ~ {item.rentalEndDate}
+                                                <Calendar size={16} /> 
+                                                <span>{item.rentalStartDate} ~ {item.rentalEndDate}</span>
                                             </div>
                                         )}
-                                    </td>
-                                    <td className="cart-item-price">
-                                        {(item.productPrice * item.quantity).toLocaleString()}원
-                                    </td>
-                                    <td>
-                                        <button onClick={() => removeItem(item.id)} className="btn-delete">삭제</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                    </div>
 
-                    <div className="cart-summary">
-                        <div className="summary-row">
-                            <span>총 상품금액</span>
-                            <span>{calculateTotal().toLocaleString()}원</span>
+                                    <div className="cart-item-actions">
+                                        <div className="quantity-control">
+                                            <button 
+                                                className="quantity-btn" 
+                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                disabled={item.quantity <= 1}
+                                            >
+                                                <Minus size={16} />
+                                            </button>
+                                            <span className="quantity-display">{item.quantity}</span>
+                                            <button 
+                                                className="quantity-btn" 
+                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                            >
+                                                <Plus size={16} />
+                                            </button>
+                                        </div>
+
+                                        <div className="cart-item-price-wrapper">
+                                            {item.quantity > 1 && (
+                                                <div className="cart-item-unit-price">
+                                                    단일가 {item.productPrice.toLocaleString()}원
+                                                </div>
+                                            )}
+                                            <div className="cart-item-total-price">
+                                                {(item.productPrice * item.quantity).toLocaleString()}원
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="cart-sidebar">
+                        <h3 className="summary-title">주문 요약</h3>
+                        
+                        <div className="summary-details">
+                            <div className="summary-row">
+                                <span>총 상품금액</span>
+                                <span>{calculateTotal().toLocaleString()}원</span>
+                            </div>
+                            <div className="summary-row muted">
+                                <span>배송비</span>
+                                <span>0원</span>
+                            </div>
+                            <div className="summary-divider"></div>
                         </div>
+
                         <div className="summary-total">
-                            <span>결제예정금액</span>
-                            <span>{calculateTotal().toLocaleString()}원</span>
+                            <span className="summary-total-label">총 결제금액</span>
+                            <span className="summary-total-amount">{calculateTotal().toLocaleString()}원</span>
                         </div>
-                        <button className="btn-checkout" onClick={() => alert('결제 시스템은 추후 연동 예정입니다.')}>주문하기</button>
+
+                        <button className="btn-checkout" onClick={() => navigate('/checkout')}>
+                            <CreditCard size={20} />
+                            결제하기 ({items.length}개)
+                        </button>
+
+                        <div className="secure-checkout-notice">
+                            <ShieldCheck size={16} />
+                            <span>안전한 결제 환경이 보장됩니다</span>
+                        </div>
                     </div>
                 </div>
             )}

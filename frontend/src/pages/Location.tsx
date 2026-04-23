@@ -2,6 +2,12 @@ import './Location.css';
 import { MapPin, Phone, Mail, Clock, Train, Bus } from 'lucide-react';
 import { useSiteSetting } from '../contexts/SiteSettingContext';
 
+const extractIframeSrc = (input: string): string => {
+    if (!input) return '';
+    const match = input.match(/src=["']([^"']+)["']/);
+    return match ? match[1] : input.trim();
+};
+
 export const LocationContent = ({ setting }: { setting: any }) => {
     if (setting?.locationAdvancedMode) {
         return (
@@ -31,21 +37,32 @@ export const LocationContent = ({ setting }: { setting: any }) => {
                 }
 
                 if (section === 'map') {
+                    const provider = setting?.locationMapProvider || 'google';
+                    const iframeSrc = provider === 'kakao'
+                        ? extractIframeSrc(setting?.locationKakaoMapIframe || '')
+                        : extractIframeSrc(setting?.locationMapIframe || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3164.7171442007466!2d127.0305886!3d37.5146059!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357ca3f707f4ebfb%3A0xeebd12df387a3cb1!2sGangnam-gu%2C%20Seoul!5e0!3m2!1sen!2skr!4v1700000000000!5m2!1sen!2skr");
+
                     return (
                         <section key="map" className="location-section map-section" style={{ paddingBottom: 0 }}>
                             <div className="container">
                                 <div className="map-container glass-card">
-                                    <iframe
-                                        title="Office Location Map"
-                                        src={setting?.locationMapIframe || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3164.7171442007466!2d127.0305886!3d37.5146059!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357ca3f707f4ebfb%3A0xeebd12df387a3cb1!2sGangnam-gu%2C%20Seoul!5e0!3m2!1sen!2skr!4v1700000000000!5m2!1sen!2skr"}
-                                        width="100%"
-                                        height="100%"
-                                        style={{ border: 0 }}
-                                        allowFullScreen={false}
-                                        loading="lazy"
-                                        referrerPolicy="no-referrer-when-downgrade"
-                                        className="map-iframe"
-                                    ></iframe>
+                                    {iframeSrc ? (
+                                        <iframe
+                                            title="Office Location Map"
+                                            src={iframeSrc}
+                                            width="100%"
+                                            height="100%"
+                                            style={{ border: 0 }}
+                                            allowFullScreen={false}
+                                            loading="lazy"
+                                            referrerPolicy="no-referrer-when-downgrade"
+                                            className="map-iframe"
+                                        ></iframe>
+                                    ) : (
+                                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+                                            지도 설정이 필요합니다.
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </section>

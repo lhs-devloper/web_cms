@@ -76,6 +76,11 @@ public class SiteSetting {
     private String aboutCustomCss = "";
 
     // 6. Location (오시는길) Settings
+    @Column(length = 20)
+    private String locationMapProvider = "google"; // "google" or "kakao"
+    @Column(columnDefinition = "TEXT")
+    private String locationKakaoMapIframe = "";
+
     @Column(length = 255)
     private String locationAddress = "서울특별시 강남구 테헤란로 123 Lumière 타워 15층";
     @Column(length = 255)
@@ -94,6 +99,18 @@ public class SiteSetting {
     private String locationCustomHtml = "";
     @Column(columnDefinition = "TEXT")
     private String locationCustomCss = "";
+
+    // 7. Story (스토리) Settings
+    @Column(length = 255)
+    private String storyPageTitle = "브랜드 스토리";
+    @Column(length = 500)
+    private String storyPageSubtitle = "우리의 이야기를 들려드립니다.";
+    @Column(columnDefinition = "BOOLEAN DEFAULT false")
+    private boolean storyAdvancedMode = false;
+    @Column(columnDefinition = "TEXT")
+    private String storyCustomHtml = "";
+    @Column(columnDefinition = "TEXT")
+    private String storyCustomCss = "";
 
     // Factory method for default settings
     public static SiteSetting createDefault() {

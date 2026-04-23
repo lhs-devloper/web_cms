@@ -1,5 +1,5 @@
 .product-container {
-    padding: 40px 20px;
+    padding: calc(var(--nav-height) + 40px) 20px 40px;
 }
 
 .product-grid {

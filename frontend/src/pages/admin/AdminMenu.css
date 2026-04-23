@@ -350,8 +350,8 @@ tbody tr:first-child.main-menu-row td {
 .input-group input[type="text"] {
     width: 100%;
     padding: 0.8rem;
-    background: rgba(var(--shadow-rgb), 0.2);
-    border: 1px solid rgba(var(--glass-rgb), 0.1);
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
     border-radius: 8px;
     font-size: 0.95rem;
     color: var(--text-primary);
@@ -361,7 +361,7 @@ tbody tr:first-child.main-menu-row td {
 .input-group input[type="text"]:focus {
     border-color: var(--primary-color, var(--primary-color));
     outline: none;
-    background: rgba(var(--shadow-rgb), 0.3);
+    background: var(--input-focus-bg);
 }
 
 .checkbox-group label {
@@ -405,8 +405,25 @@ tbody tr:first-child.main-menu-row td {
 }
 
 .btn-submit:disabled {
-    background: #555;
-    color: var(--text-disabled);
+    background: var(--disabled-bg);
+    color: var(--disabled-color);
     cursor: not-allowed;
     transform: none;
+}
+
+.btn-cancel {
+    flex: 1;
+    padding: 0.8rem;
+    background: transparent;
+    border: 1px solid rgba(var(--glass-rgb), 0.2);
+    color: var(--muted-color);
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+    background: rgba(var(--glass-rgb), 0.1);
+    color: var(--text-primary);
 }

@@ -54,7 +54,7 @@ const Footer = () => {
 
             <div className="footer-bottom">
                 <div className="container">
-                    <p>{setting?.footerCopyright || `© ${new Date().getFullYear()} Lumière. All rights reserved.`}</p>
+                    <p>{setting?.footerCopyright || `© ${new Date().getFullYear()} ${setting?.siteName || 'CMS'}. All rights reserved.`}</p>
                     <div className="payment-icons">
                         {/* Dummy icons for payment methods */}
                         <span className="payment-icon">VISA</span>

@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Map;
@@ -16,11 +19,13 @@ import java.util.HashMap;
 @RestController
 @RequestMapping("/api/admin/user")
 @RequiredArgsConstructor
+@Tag(name = "관리자회원검색", description = "회원 검색 API (관리자 전용)")
 public class AdminUserApiController {
 
     @Autowired
     private UserRepository userRepository;
 
+    @Operation(summary = "회원 검색", description = "키워드 또는 역할로 회원을 검색합니다.")
     @GetMapping("/search")
     public ResponseEntity<List<Map<String, Object>>> searchUsers(
             @RequestParam(required = false) String keyword,

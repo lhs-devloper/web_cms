@@ -5,6 +5,8 @@ import com.lhsdev.cmsproject.config.auth.jwt.JwtProvider;
 import com.lhsdev.cmsproject.domain.user.Role;
 import com.lhsdev.cmsproject.domain.user.User;
 import com.lhsdev.cmsproject.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,12 +23,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "인증", description = "로그인, 회원가입 API")
 public class AuthController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
+    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인하여 JWT 토큰을 발급합니다.")
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.getEmail()).orElse(null);
@@ -46,6 +50,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다.")
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupRequest signupRequest) {
         if (userRepository.findByEmail(signupRequest.getEmail()).isPresent()) {

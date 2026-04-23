@@ -1,11 +1,14 @@
 package com.lhsdev.cmsproject.domain.user;
 
+import com.lhsdev.cmsproject.domain.membership.MembershipGrade;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
@@ -36,6 +39,14 @@ public class User {
     private AuthProvider provider;
 
     private String providerId;
+
+    private int totalPoints = 0;
+
+    private int availablePoints = 0;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "grade_id")
+    private MembershipGrade grade;
 
     @Builder
     public User(String name, String email, String password, String picture, Role role, AuthProvider provider,

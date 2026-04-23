@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMS Project - API Documentation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        #api-group-selector {
+            height: 46px;
+            background: #fafafa;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        #api-group-selector label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+        }
+        #api-group-selector select {
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            background: #fff;
+        }
+        #api-group-selector .links {
+            margin-left: auto;
+            display: flex;
+            gap: 12px;
+        }
+        #api-group-selector .links a {
+            color: #1a73e8;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        #api-group-selector .links a:hover {
+            text-decoration: underline;
+        }
+        #redoc-frame {
+            width: 100%;
+            height: calc(100vh - 46px);
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="api-group-selector">
+        <label for="group-select">API Group:</label>
+        <select id="group-select" onchange="loadGroup(this.value)">
+            <option value="">-- Loading... --</option>
+        </select>
+        <div class="links">
+            <a href="/swagger-ui.html" target="_blank">Swagger UI</a>
+            <a href="/v3/api-docs" target="_blank">OpenAPI JSON</a>
+        </div>
+    </div>
+    <iframe id="redoc-frame"></iframe>
+
+    <script>
+        const groupSelect = document.getElementById('group-select');
+        const frame = document.getElementById('redoc-frame');
+
+        async function loadGroups() {
+            try {
+                const res = await fetch('/v3/api-docs/swagger-config');
+                const config = await res.json();
+                groupSelect.innerHTML = '';
+
+                if (config.urls && config.urls.length > 0) {
+                    config.urls.sort((a, b) => a.name.localeCompare(b.name));
+                    config.urls.forEach(u => {
+                        const opt = document.createElement('option');
+                        opt.value = u.url;
+                        opt.textContent = u.name;
+                        groupSelect.appendChild(opt);
+                    });
+                    loadGroup(config.urls[0].url);
+                } else {
+                    groupSelect.innerHTML = '<option value="/v3/api-docs">All APIs</option>';
+                    loadGroup('/v3/api-docs');
+                }
+            } catch (e) {
+                groupSelect.innerHTML = '<option value="/v3/api-docs">All APIs</option>';
+                loadGroup('/v3/api-docs');
+            }
+        }
+
+        function loadGroup(specUrl) {
+            const html = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>body { margin: 0; }</style>
+</head>
+<body>
+    <div id="redoc"></div>
+    <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"><\/script>
+    <script>
+        fetch('${specUrl}')
+            .then(r => r.json())
+            .then(spec => {
+                Redoc.init(spec, {
+                    hideDownloadButton: false,
+                    expandResponses: '200',
+                    pathInMiddlePanel: true,
+                    jsonSampleExpandLevel: 2,
+                    menuToggle: true,
+                    lazyRendering: false,
+                    nativeScrollbars: true,
+                    theme: {
+                        colors: { primary: { main: '#1a73e8' } },
+                        typography: {
+                            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                            fontSize: '15px',
+                            headings: { fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }
+                        },
+                        sidebar: { width: '260px', backgroundColor: '#fafafa' },
+                        rightPanel: { backgroundColor: '#263238' }
+                    }
+                }, document.getElementById('redoc'));
+            });
+    <\/script>
+</body>
+</html>`;
+
+            frame.srcdoc = html;
+        }
+
+        loadGroups();
+    </script>
+</body>
+</html>

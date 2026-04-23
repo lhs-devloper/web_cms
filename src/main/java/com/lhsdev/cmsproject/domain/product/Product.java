@@ -27,9 +27,9 @@ public class Product extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ProductType type;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id")
+    private ProductCategory category;
 
     private Integer stockQuantity;
 
@@ -37,33 +37,71 @@ public class Product extends BaseTimeEntity {
 
     private boolean active = true;
 
+    private int pointReward = 0;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "image_url")
     private List<String> imageUrls = new ArrayList<>();
 
     @Builder
-    public Product(String name, int price, String description, ProductType type,
-            Integer stockQuantity, Integer rentalAvailableCount, List<String> imageUrls, boolean active) {
+    public Product(String name, int price, String description, ProductCategory category,
+            Integer stockQuantity, Integer rentalAvailableCount, List<String> imageUrls, boolean active, int pointReward) {
         this.name = name;
         this.price = price;
         this.description = description;
-        this.type = type;
+        this.category = category;
         this.stockQuantity = stockQuantity;
         this.rentalAvailableCount = rentalAvailableCount;
         this.imageUrls = imageUrls;
         this.active = active;
+        this.pointReward = pointReward;
     }
 
-    public void update(String name, int price, String description, ProductType type, Integer stockQuantity,
-            Integer rentalAvailableCount, List<String> imageUrls, boolean active) {
+    public void decreaseStock(int quantity) {
+        if (this.stockQuantity == null || this.stockQuantity < quantity) {
+            throw new IllegalStateException("재고가 부족합니다.");
+        }
+        this.stockQuantity -= quantity;
+    }
+
+    public void increaseStock(int quantity) {
+        if (this.stockQuantity == null) {
+            this.stockQuantity = 0;
+        }
+        this.stockQuantity += quantity;
+    }
+
+    public void decreaseRentalCount(int quantity) {
+        if (this.rentalAvailableCount == null || this.rentalAvailableCount < quantity) {
+            throw new IllegalStateException("대여 가능 수량이 부족합니다.");
+        }
+        this.rentalAvailableCount -= quantity;
+    }
+
+    public void increaseRentalCount(int quantity) {
+        if (this.rentalAvailableCount == null) {
+            this.rentalAvailableCount = 0;
+        }
+        this.rentalAvailableCount += quantity;
+    }
+
+    public void update(String name, int price, String description, ProductCategory category, Integer stockQuantity,
+            Integer rentalAvailableCount, List<String> imageUrls, boolean active, int pointReward) {
         this.name = name;
         this.price = price;
         this.description = description;
-        this.type = type;
+        this.category = category;
         this.stockQuantity = stockQuantity;
         this.rentalAvailableCount = rentalAvailableCount;
-        this.imageUrls = imageUrls;
+        if (this.imageUrls == null) {
+            this.imageUrls = new ArrayList<>();
+        }
+        this.imageUrls.clear();
+        if (imageUrls != null) {
+            this.imageUrls.addAll(imageUrls);
+        }
         this.active = active;
+        this.pointReward = pointReward;
     }
 }

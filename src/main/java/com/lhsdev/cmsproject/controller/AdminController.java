@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +21,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
+@Tag(name = "관리자일반", description = "관리자 대시보드 및 게시판/메뉴 관리 API")
 public class AdminController {
     @Autowired
     private BoardService boardService;
@@ -28,6 +32,7 @@ public class AdminController {
 
     private final com.lhsdev.cmsproject.service.VisitorService visitorService;
 
+    @Operation(summary = "관리자 대시보드", description = "관리자 대시보드 데이터를 조회합니다.")
     @GetMapping({ "", "/" })
     public ResponseEntity<?> main() {
         Map<String, Object> response = new HashMap<>();
@@ -38,6 +43,7 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "게시판 관리 목록", description = "관리 가능한 게시판 목록을 조회합니다.")
     @GetMapping("/board")
     public ResponseEntity<?> boardManage() {
         Map<String, Object> response = new HashMap<>();
@@ -45,6 +51,7 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "게시판 생성", description = "새 게시판을 생성합니다.")
     @PostMapping("/board/create")
     public ResponseEntity<?> createBoard(@RequestParam("boardId") String boardId,
             @RequestParam(value = "readPermission", defaultValue = "ALL") String readPermission,
@@ -59,6 +66,7 @@ public class AdminController {
         }
     }
 
+    @Operation(summary = "게시판 수정 폼", description = "게시판 수정을 위한 데이터를 조회합니다.")
     @GetMapping("/board/edit/{boardId}")
     public ResponseEntity<?> editBoardForm(@PathVariable("boardId") String boardId) {
         var boardOpt = boardMetaRepository.findByBoardId(boardId);
@@ -67,6 +75,7 @@ public class AdminController {
         return ResponseEntity.ok(Map.of("board", boardOpt.get()));
     }
 
+    @Operation(summary = "게시판 수정", description = "게시판 설정을 수정합니다.")
     @PostMapping("/board/update")
     public ResponseEntity<?> updateBoard(@RequestParam("boardId") String boardId,
             @RequestParam("readPermission") String readPermission,
@@ -80,6 +89,7 @@ public class AdminController {
         }
     }
 
+    @Operation(summary = "게시판 삭제", description = "게시판을 삭제합니다.")
     @PostMapping("/board/delete")
     public ResponseEntity<?> deleteBoard(@RequestParam("boardId") String boardId) {
         try {
@@ -90,6 +100,7 @@ public class AdminController {
         }
     }
 
+    @Operation(summary = "메뉴 관리 목록", description = "관리 가능한 메뉴 목록을 조회합니다.")
     @GetMapping("/menu")
     public ResponseEntity<?> menuManage() {
         Map<String, Object> response = new HashMap<>();
@@ -99,6 +110,7 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "메뉴 순서 변경", description = "메뉴의 표시 순서를 변경합니다.")
     @PostMapping("/menu/reorder")
     public ResponseEntity<?> reorderMenus(@RequestBody List<Long> menuIds) {
         try {
@@ -114,6 +126,7 @@ public class AdminController {
         }
     }
 
+    @Operation(summary = "메뉴 저장", description = "메뉴를 등록 또는 수정합니다.")
     @PostMapping("/menu/save")
     public ResponseEntity<?> saveMenu(@ModelAttribute Menu menu) {
         try {
@@ -124,6 +137,7 @@ public class AdminController {
         }
     }
 
+    @Operation(summary = "메뉴 삭제", description = "메뉴를 삭제합니다.")
     @PostMapping("/menu/delete")
     public ResponseEntity<?> deleteMenu(@RequestParam("id") Long id) {
         try {

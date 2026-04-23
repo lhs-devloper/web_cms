@@ -32,9 +32,14 @@ const BoardList = () => {
                     const data = await res.json();
                     setBoardInfo(data.board);
                     setPosts(data.posts || []);
+                } else if (res.status === 404) {
+                    alert('존재하지 않는 게시판입니다.');
+                    navigate(-1);
+                    return;
                 } else if (res.status === 403) {
                     alert('게시판 접근 권한이 없습니다.');
-                    navigate('/');
+                    navigate(-1);
+                    return;
                 }
             } catch (error) {
                 console.error(error);

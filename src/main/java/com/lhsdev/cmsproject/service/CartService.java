@@ -32,7 +32,7 @@ public class CartService {
             dto.setProductId(item.getProduct().getId());
             dto.setProductName(item.getProduct().getName());
             dto.setProductPrice(item.getProduct().getPrice());
-            dto.setProductType(item.getProduct().getType().name());
+            dto.setProductType(item.getProduct().getCategory().getCode());
             dto.setImageUrl(item.getProduct().getImageUrls() != null && !item.getProduct().getImageUrls().isEmpty()
                     ? item.getProduct().getImageUrls().get(0)
                     : "");

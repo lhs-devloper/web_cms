@@ -1,0 +1,93 @@
+.membership-page {
+    padding: 120px 2rem 4rem;
+    min-height: 100vh;
+    background: var(--bg-color);
+}
+
+.membership-hero {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.membership-hero h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--title-color);
+}
+
+.my-grade-card {
+    max-width: 400px;
+    margin: 0 auto 3rem;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+}
+
+.my-grade-badge {
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.my-points {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--title-color);
+}
+
+.grades-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.grade-info-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.grade-info-card:hover {
+    transform: translateY(-4px);
+}
+
+.grade-info-card.current {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.grade-info-header {
+    padding: 1.5rem;
+    color: #fff;
+    text-align: center;
+}
+
+.grade-info-header h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.3rem;
+}
+
+.grade-info-body {
+    padding: 1.5rem;
+}
+
+.grade-info-body .benefit-item {
+    padding: 0.4rem 0;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.grade-info-body .benefit-item:last-child {
+    border-bottom: none;
+}

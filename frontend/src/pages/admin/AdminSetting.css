@@ -355,3 +355,32 @@ textarea.form-control {
 .preview-modal-body>div {
     min-height: 100%;
 }
+
+/* Social Setting Messages */
+.social-message {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.social-message.success {
+    background: rgba(0, 210, 255, 0.1);
+    border: 1px solid rgba(0, 210, 255, 0.3);
+    color: var(--primary-color);
+}
+
+.social-message.error {
+    background: rgba(255, 82, 82, 0.1);
+    border: 1px solid rgba(255, 82, 82, 0.3);
+    color: #ff5252;
+}
+
+.social-empty {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-disabled);
+}

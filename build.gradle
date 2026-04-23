@@ -43,7 +43,8 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-restclient-test'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	// JWT
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'

@@ -359,8 +359,8 @@
 .input-group select,
 .input-group textarea {
     padding: 0.8rem 1rem;
-    background: rgba(var(--shadow-rgb), 0.5);
-    border: 1px solid rgba(var(--glass-rgb), 0.2);
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
     border-radius: 8px;
     color: var(--text-primary);
     font-family: inherit;

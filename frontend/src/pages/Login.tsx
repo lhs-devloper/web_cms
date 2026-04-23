@@ -1,12 +1,50 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
 import './Login.css';
 
+interface SocialProvider {
+    registrationId: string;
+    clientName: string;
+}
+
+const SOCIAL_META: Record<string, { icon: string; alt: string; className: string }> = {
+    kakao: { icon: '/icons/kakao.svg', alt: 'Kakao', className: 'kakao' },
+    naver: { icon: '/icons/naver.svg', alt: 'Naver', className: 'naver' },
+    google: { icon: '/icons/google.svg', alt: 'Google', className: 'google' },
+    github: { icon: '/icons/github.svg', alt: 'Github', className: 'github' },
+};
+
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [socialProviders, setSocialProviders] = useState<SocialProvider[]>([]);
+    const [siteSetting, setSiteSetting] = useState<any>(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchSocialProviders = async () => {
+            try {
+                const res = await fetch(`http://${window.location.hostname}:8080/api/global/social/active`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setSocialProviders(data);
+                }
+            } catch (err) {
+                console.error('Failed to load social providers:', err);
+            }
+        };
+        const fetchSiteSetting = async () => {
+            try {
+                const res = await fetch(`http://${window.location.hostname}:8080/api/global/setting`);
+                if (res.ok) setSiteSetting(await res.json());
+            } catch (err) {
+                console.error('Failed to load site setting:', err);
+            }
+        };
+        fetchSocialProviders();
+        fetchSiteSetting();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -42,13 +80,17 @@ const Login = () => {
         <div className="login-container">
             <div className="login-box animate-fade-in">
                 <div className="login-header">
-                    <h2>Lumière</h2>
+                    {siteSetting?.logoUrl ? (
+                        <img src={siteSetting.logoUrl.startsWith('http') ? siteSetting.logoUrl : `http://${window.location.hostname}:8080${siteSetting.logoUrl}`} alt={siteSetting?.logoAltText || 'Logo'} style={{ maxHeight: '48px', marginBottom: '0.5rem' }} />
+                    ) : (
+                        <h2>{siteSetting?.siteName || 'Lumière'}</h2>
+                    )}
                     <p>프리미엄 회원을 위한 로그인</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="login-form">
-                    <div className="input-group">
-                        <div className="input-icon">
+                    <label htmlFor="email" className="login-input-group">
+                        <div className="login-input-icon">
                             <Mail size={18} />
                         </div>
                         <input
@@ -59,10 +101,10 @@ const Login = () => {
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
-                    </div>
+                    </label>
 
-                    <div className="input-group">
-                        <div className="input-icon">
+                    <label htmlFor="password" className="login-input-group">
+                        <div className="login-input-icon">
                             <Lock size={18} />
                         </div>
                         <input
@@ -73,7 +115,7 @@ const Login = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
-                    </div>
+                    </label>
 
                     <div className="login-options">
                         <label className="checkbox-container">
@@ -92,24 +134,30 @@ const Login = () => {
                         계정이 없으신가요? <Link to="/signup">회원가입</Link>
                     </div>
 
-                    <div className="social-login-divider">
-                        <span>또는 간편 로그인</span>
-                    </div>
+                    {socialProviders.length > 0 && (
+                        <>
+                            <div className="social-login-divider">
+                                <span>또는 간편 로그인</span>
+                            </div>
 
-                    <div className="social-login-group">
-                        <button type="button" className="social-btn kakao" onClick={() => window.location.href = `http://${window.location.hostname}:8080/oauth2/authorization/kakao`}>
-                            <img src="/icons/kakao.svg" alt="Kakao" />
-                        </button>
-                        <button type="button" className="social-btn naver" onClick={() => window.location.href = `http://${window.location.hostname}:8080/oauth2/authorization/naver`}>
-                            <img src="/icons/naver.svg" alt="Naver" />
-                        </button>
-                        <button type="button" className="social-btn google" onClick={() => window.location.href = `http://${window.location.hostname}:8080/oauth2/authorization/google`}>
-                            <img src="/icons/google.svg" alt="Google" />
-                        </button>
-                        <button type="button" className="social-btn github" onClick={() => window.location.href = `http://${window.location.hostname}:8080/oauth2/authorization/github`}>
-                            <img src="/icons/github.svg" alt="Github" />
-                        </button>
-                    </div>
+                            <div className="social-login-group">
+                                {socialProviders.map(provider => {
+                                    const meta = SOCIAL_META[provider.registrationId.toLowerCase()];
+                                    if (!meta) return null;
+                                    return (
+                                        <button
+                                            key={provider.registrationId}
+                                            type="button"
+                                            className={`social-btn ${meta.className}`}
+                                            onClick={() => window.location.href = `http://${window.location.hostname}:8080/oauth2/authorization/${provider.registrationId}`}
+                                        >
+                                            <img src={meta.icon} alt={meta.alt} />
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </>
+                    )}
                 </form>
             </div>
 

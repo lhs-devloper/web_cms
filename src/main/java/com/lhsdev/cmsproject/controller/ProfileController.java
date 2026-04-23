@@ -12,12 +12,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/profile")
 @RequiredArgsConstructor
+@Tag(name = "프로필", description = "사용자 프로필 관리 API")
 public class ProfileController {
 
     @Autowired
@@ -28,6 +32,7 @@ public class ProfileController {
     @org.springframework.beans.factory.annotation.Value("${app.upload.dir}")
     private String uploadDir;
 
+    @Operation(summary = "내 프로필 조회", description = "현재 로그인한 사용자의 프로필을 조회합니다.")
     @GetMapping
     public ResponseEntity<?> profile(@AuthenticationPrincipal PrincipalDetails principal) {
         if (principal == null) {
@@ -39,6 +44,7 @@ public class ProfileController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "프로필 수정", description = "사용자 이름 및 프로필 사진을 수정합니다.")
     @PostMapping("/update")
     public ResponseEntity<?> updateProfile(@AuthenticationPrincipal PrincipalDetails principal,
             @RequestParam String name,
@@ -76,6 +82,7 @@ public class ProfileController {
         return ResponseEntity.ok(Map.of("success", true, "message", "프로필이 업데이트되었습니다."));
     }
 
+    @Operation(summary = "비밀번호 변경", description = "현재 비밀번호 확인 후 새 비밀번호로 변경합니다.")
     @PostMapping("/password")
     public ResponseEntity<?> updatePassword(@AuthenticationPrincipal PrincipalDetails principal,
             @RequestParam String currentPassword,

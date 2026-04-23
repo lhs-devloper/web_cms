@@ -6,5 +6,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0', // 외부 (모바일, 다른 PC 등) 접속 허용
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      }
+    }
   },
 })

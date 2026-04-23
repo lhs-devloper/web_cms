@@ -221,6 +221,47 @@
     font-size: 1rem;
 }
 
+/* Board Index */
+.board-index-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.board-index-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.board-index-card:hover {
+    border-color: var(--primary-color);
+    background: rgba(0, 210, 255, 0.03);
+}
+
+.board-index-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.board-index-arrow {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    transition: transform 0.2s ease;
+}
+
+.board-index-card:hover .board-index-arrow {
+    transform: translateX(4px);
+    color: var(--primary-color);
+}
+
 .post-content.ql-editor {
     padding: 0;
 }

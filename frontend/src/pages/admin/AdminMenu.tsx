@@ -19,11 +19,27 @@ const emptyMenu: Menu = {
     parentId: null
 };
 
+interface UrlOption {
+    label: string;
+    url: string;
+}
+
+const STATIC_URLS: UrlOption[] = [
+    { label: '홈', url: '/' },
+    { label: '회사소개', url: '/about' },
+    { label: '오시는길', url: '/location' },
+    { label: '상품 목록', url: '/products' },
+    { label: '장바구니', url: '/cart' },
+    { label: '마이페이지', url: '/mypage' },
+    { label: '주문내역', url: '/orders' },
+];
+
 const AdminMenu = () => {
     const [menus, setMenus] = useState<Menu[]>([]);
     const [loading, setLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentMenu, setCurrentMenu] = useState<Menu>(emptyMenu);
+    const [availableUrls, setAvailableUrls] = useState<UrlOption[]>(STATIC_URLS);
 
     const fetchMenus = async () => {
         try {
@@ -37,8 +53,25 @@ const AdminMenu = () => {
         }
     };
 
+    const fetchBoards = async () => {
+        try {
+            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/board`);
+            if (res.ok) {
+                const data = await res.json();
+                const boards: UrlOption[] = (data.boards || []).map((b: any) => ({
+                    label: `게시판: ${b.boardId}`,
+                    url: `/board/${b.boardId}`
+                }));
+                setAvailableUrls([...STATIC_URLS, ...boards]);
+            }
+        } catch (error) {
+            console.error('Failed to load boards:', error);
+        }
+    };
+
     useEffect(() => {
         fetchMenus();
+        fetchBoards();
     }, []);
 
     const handleOpenModal = (menu?: Menu, parentId: number | null = null) => {
@@ -54,6 +87,14 @@ const AdminMenu = () => {
         setIsModalOpen(false);
         setCurrentMenu(emptyMenu);
     };
+
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isModalOpen) handleCloseModal();
+        };
+        document.addEventListener('keydown', handleEsc);
+        return () => document.removeEventListener('keydown', handleEsc);
+    }, [isModalOpen]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -331,6 +372,19 @@ const AdminMenu = () => {
                                 </div>
                                 <div className="input-group">
                                     <label>연결 링크 (URL)</label>
+                                    <select
+                                        value={availableUrls.some(u => u.url === currentMenu.linkUrl) ? currentMenu.linkUrl : '__custom__'}
+                                        onChange={(e) => {
+                                            if (e.target.value === '__custom__') return;
+                                            setCurrentMenu(prev => ({ ...prev, linkUrl: e.target.value }));
+                                        }}
+                                        style={{ width: '100%', padding: '0.6rem 0.8rem', marginBottom: '0.5rem', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem' }}
+                                    >
+                                        <option value="__custom__">-- 직접 입력 --</option>
+                                        {availableUrls.map(opt => (
+                                            <option key={opt.url} value={opt.url}>{opt.label} ({opt.url})</option>
+                                        ))}
+                                    </select>
                                     <input type="text" name="linkUrl" value={currentMenu.linkUrl} onChange={handleChange} required placeholder="ex) /about 혹은 https://..." />
                                 </div>
                                 <div className="input-group checkbox-group" style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
@@ -340,10 +394,10 @@ const AdminMenu = () => {
                                     </label>
                                 </div>
                                 <div className="modal-actions" style={{ display: 'flex', gap: '0.8rem' }}>
-                                    <button type="button" className="btn-cancel" onClick={handleCloseModal} style={{ flex: 1, padding: '0.8rem', background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', borderRadius: '6px', cursor: 'pointer' }}>
+                                    <button type="button" className="btn-cancel" onClick={handleCloseModal}>
                                         취소
                                     </button>
-                                    <button type="submit" className="btn-submit" disabled={loading} style={{ flex: 1, padding: '0.8rem', background: '#00d2ff', color: '#000', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 700 }}>
+                                    <button type="submit" className="btn-submit" disabled={loading}>
                                         {loading ? '저장 중...' : '저장 완료'}
                                     </button>
                                 </div>

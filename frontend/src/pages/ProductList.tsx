@@ -8,6 +8,7 @@ interface Product {
     price: number;
     description: string;
     type: string;
+    categoryName: string;
     imageUrls: string[];
     active: boolean;
 }
@@ -42,7 +43,7 @@ const ProductList: React.FC = () => {
                                 <h3>{p.name}</h3>
                                 <p className="product-price">{p.price.toLocaleString()}원</p>
                                 <div className="product-type-badge">
-                                    {p.type === 'NORMAL' ? '일반상품' : '대여상품'}
+                                    {p.categoryName || p.type}
                                 </div>
                             </div>
                         </Link>

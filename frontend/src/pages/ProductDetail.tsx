@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Minus, Plus } from 'lucide-react';
 import './ProductDetail.css';
 
 interface Product {
@@ -8,6 +9,10 @@ interface Product {
     price: number;
     description: string;
     type: string;
+    categoryId: number;
+    categoryName: string;
+    hasStock: boolean;
+    hasRentalPeriod: boolean;
     imageUrls: string[];
 }
 
@@ -33,7 +38,7 @@ const ProductDetail: React.FC = () => {
     }, [id]);
 
     const handleAddToCart = async () => {
-        if (product?.type === 'RENTAL' && (!rentalStartDate || !rentalEndDate)) {
+        if (product?.hasRentalPeriod && (!rentalStartDate || !rentalEndDate)) {
             alert('대여 시작일과 종료일을 선택해주세요.');
             return;
         }
@@ -42,7 +47,8 @@ const ProductDetail: React.FC = () => {
             const res = await fetch('/api/cart/add', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    ...(localStorage.getItem('accessToken') ? { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` } : {})
                 },
                 body: JSON.stringify({
                     productId: product?.id,
@@ -105,7 +111,7 @@ const ProductDetail: React.FC = () => {
                     <div className="product-detail-price">{product.price.toLocaleString()}원</div>
 
                     <div className="product-detail-options">
-                        {product.type === 'RENTAL' && (
+                        {product.hasRentalPeriod && (
                             <div className="rental-options">
                                 <label>대여 일정</label>
                                 <div className="date-inputs">
@@ -119,9 +125,20 @@ const ProductDetail: React.FC = () => {
                         <div className="quantity-option">
                             <label>수량</label>
                             <div className="quantity-controls">
-                                <button onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
-                                <span>{quantity}</span>
-                                <button onClick={() => setQuantity(q => q + 1)}>+</button>
+                                <button
+                                    className="qty-btn qty-minus"
+                                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                                    disabled={quantity <= 1}
+                                >
+                                    <Minus size={16} />
+                                </button>
+                                <span className="qty-value">{quantity}</span>
+                                <button
+                                    className="qty-btn qty-plus"
+                                    onClick={() => setQuantity(q => q + 1)}
+                                >
+                                    <Plus size={16} />
+                                </button>
                             </div>
                         </div>
 

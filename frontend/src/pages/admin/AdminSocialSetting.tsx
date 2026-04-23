@@ -67,23 +67,15 @@ const AdminSocialSetting = () => {
         setSavingId(social.id);
 
         try {
-            const formData = new FormData();
-
-            // Append all fields to prevent null overwrites
-            Object.entries(social).forEach(([key, value]) => {
-                if (value !== null && value !== undefined) {
-                    formData.append(key, value.toString());
-                }
-            });
-
-            // Since isActive is boolean, we might need to send it explicitly
-            // Spring may expect 'active' instead of 'isActive' depending on Jackson/Form bindings. 
-            // In SocialServiceConfig, the field is 'isActive'. The getter is 'isActive()', setter is 'setActive()'. 
-            // Thus, Spring binds to 'active'. 
+            const payload = {
+                ...social,
+                isActive: social.active
+            };
 
             const res = await fetch(`http://${window.location.hostname}:8080/api/admin/social/save`, {
                 method: 'POST',
-                body: formData
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
             });
 
             if (res.ok) {
@@ -114,12 +106,7 @@ const AdminSocialSetting = () => {
             </div>
 
             {message && (
-                <div style={{
-                    marginBottom: '2rem', padding: '1rem', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.5rem',
-                    background: message.type === 'success' ? 'rgba(0, 210, 255, 0.1)' : 'rgba(255, 82, 82, 0.1)',
-                    border: `1px solid ${message.type === 'success' ? 'rgba(0, 210, 255, 0.3)' : 'rgba(255, 82, 82, 0.3)'}`,
-                    color: message.type === 'success' ? '#00d2ff' : '#ff5252'
-                }}>
+                <div className={`social-message ${message.type}`}>
                     <AlertCircle size={18} /> {message.text}
                 </div>
             )}
@@ -193,7 +180,7 @@ const AdminSocialSetting = () => {
                 ))}
             </div>
             {socials.length === 0 && !loading && (
-                <div style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8' }}>
+                <div className="social-empty">
                     등록된 간편로그인 설정이 없습니다.
                 </div>
             )}

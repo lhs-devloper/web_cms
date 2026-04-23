@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,11 +23,13 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("/api/files")
+@Tag(name = "파일", description = "파일 업로드 API")
 public class FileController {
 
     @Value("${app.upload.dir}")
     private String uploadDir;
 
+    @Operation(summary = "파일 업로드", description = "파일을 서버에 업로드합니다.")
     @PostMapping("/upload")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
         if (file.isEmpty()) {

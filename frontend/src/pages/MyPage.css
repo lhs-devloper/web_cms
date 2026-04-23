@@ -62,7 +62,7 @@
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid #2a2c35;
+    border: 3px solid var(--glass-border);
     box-shadow: 0 4px 15px rgba(var(--shadow-rgb), 0.5);
 }
 
@@ -74,7 +74,7 @@
     height: 36px;
     border-radius: 50%;
     background: var(--primary-color);
-    color: #111;
+    color: var(--bg-color);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -95,7 +95,7 @@
 
 .profile-email {
     font-size: 0.85rem;
-    color: #999;
+    color: var(--text-disabled);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -280,31 +280,124 @@
     white-space: nowrap;
 }
 
-.order-status.delivering {
-    background: rgba(0, 210, 255, 0.1);
-    color: var(--primary-color);
+.order-status.shipped {
+    background: rgba(155, 89, 182, 0.1);
+    color: #9b59b6;
 }
 
-.order-status.completed {
+.order-status.delivered {
     background: rgba(46, 204, 113, 0.1);
     color: #2ecc71;
 }
 
-/* Edit Profile Modal */
+.order-status.pending {
+    background: rgba(241, 196, 15, 0.1);
+    color: #f1c40f;
+}
+
+.order-status.confirmed {
+    background: rgba(0, 210, 255, 0.1);
+    color: var(--primary-color);
+}
+
+.order-status.cancelled {
+    background: rgba(255, 82, 82, 0.1);
+    color: #ff5252;
+}
+
+/* Pending Order - Clickable */
+.order-item-pending {
+    cursor: pointer;
+    position: relative;
+    border: 1px solid rgba(241, 196, 15, 0.15);
+}
+
+.order-item-pending:hover {
+    background: rgba(241, 196, 15, 0.05) !important;
+    border-color: rgba(241, 196, 15, 0.3);
+}
+
+/* Retry Payment Modal */
+.retry-order-summary {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(var(--glass-rgb), 0.05);
+    border-radius: 8px;
+}
+
+.retry-order-number {
+    font-size: 0.85rem;
+    color: var(--text-disabled);
+    margin-bottom: 0.3rem;
+}
+
+.retry-order-total {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.retry-order-total strong {
+    font-size: 1.3rem;
+}
+
+.retry-method-section h4 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.retry-method-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.retry-method-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 1rem 0.5rem;
+    border: 2px solid rgba(var(--glass-rgb), 0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    color: var(--text-muted-alt);
+    background: rgba(var(--glass-rgb), 0.03);
+}
+
+.retry-method-card:hover {
+    border-color: rgba(var(--glass-rgb), 0.25);
+}
+
+.retry-method-card.selected {
+    border-color: var(--primary-color);
+    background: rgba(0, 210, 255, 0.08);
+    color: var(--primary-color);
+}
+
+.retry-method-icon {
+    font-size: 1.4rem;
+}
+
 /* Edit Profile Modal */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(var(--shadow-rgb), 0.6);
+    width: 100vw;
+    height: 100vh;
+    background: rgba(var(--shadow-rgb), 0.75);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 9999;
 }
 
 .modal-content {
@@ -315,8 +408,8 @@
     box-sizing: border-box;
     max-height: 90vh;
     overflow-y: auto;
-    background: rgba(20, 22, 28, 0.85);
-    border: 1px solid rgba(var(--glass-rgb), 0.1);
+    background: var(--panel-bg);
+    border: 1px solid var(--glass-border);
     border-radius: 16px;
     box-shadow: 0 25px 50px -12px rgba(var(--shadow-rgb), 0.8);
     transform: translateY(0);
@@ -366,13 +459,13 @@
 
 .input-group label {
     font-size: 0.85rem;
-    color: #bbb;
+    color: var(--text-muted-alt);
     font-weight: 500;
 }
 
 .input-group input {
-    background: rgba(var(--glass-rgb), 0.05);
-    border: 1px solid rgba(var(--glass-rgb), 0.15);
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
     padding: 1rem 1.2rem;
     border-radius: 10px;
     color: var(--text-primary);
@@ -383,7 +476,7 @@
 .input-group input:focus {
     outline: none;
     border-color: var(--primary-color);
-    background: rgba(var(--glass-rgb), 0.1);
+    background: var(--input-focus-bg);
     box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.2);
 }
 

@@ -23,9 +23,14 @@ const BoardView = () => {
                 if (res.ok) {
                     const data = await res.json();
                     setPost(data.post);
+                } else if (res.status === 404) {
+                    alert('존재하지 않는 게시판이거나 게시글입니다.');
+                    navigate(-1);
+                    return;
                 } else if (res.status === 403) {
                     alert('접근 권한이 없습니다.');
-                    navigate(`/board/${boardId}`);
+                    navigate(-1);
+                    return;
                 }
             } catch (error) {
                 console.error(error);

@@ -5,6 +5,7 @@
     display: flex;
     align-items: center;
     overflow: hidden;
+    margin-top: var(--nav-height);
 }
 
 .hero-bg {
@@ -49,10 +50,8 @@
 .hero-content {
     position: relative;
     z-index: 10;
-    padding-top: var(--nav-height);
     max-width: 800px;
     margin-left: 0;
-    /* Align left with container */
 }
 
 .hero-subtitle {

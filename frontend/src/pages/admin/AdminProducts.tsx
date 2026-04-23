@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import { Upload, X, Plus } from 'lucide-react';
+import { Upload, X, Plus, Edit2, Trash2 } from 'lucide-react';
 import './AdminProducts.css';
 
 interface Product {
@@ -9,7 +9,11 @@ interface Product {
     name: string;
     price: number;
     description: string;
-    type: 'NORMAL' | 'RENTAL';
+    type: string;
+    categoryId: number;
+    categoryName: string;
+    hasStock: boolean;
+    hasRentalPeriod: boolean;
     stockQuantity: number;
     rentalAvailableCount: number;
     active: boolean;
@@ -18,18 +22,21 @@ interface Product {
 
 const AdminProducts: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<any[]>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const quillRef = useRef<ReactQuill>(null);
 
-    const [formData, setFormData] = useState<Partial<Product>>({
+    const [formData, setFormData] = useState<any>({
         name: '',
         price: 0,
+        pointReward: 0,
         description: '',
-        type: 'NORMAL',
+        categoryId: '',
         stockQuantity: 0,
         rentalAvailableCount: 0,
         active: true,
@@ -38,13 +45,29 @@ const AdminProducts: React.FC = () => {
 
     useEffect(() => {
         fetchProducts();
+        fetchCategories();
     }, []);
+
+    const fetchCategories = async () => {
+        try {
+            const res = await fetch(`http://${window.location.hostname}:8080/api/admin/product-categories`);
+            if (res.ok) setCategories(await res.json());
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const selectedCategory = categories.find(c => c.id === Number(formData.categoryId));
 
     const fetchProducts = async () => {
         try {
             const res = await fetch('/api/admin/products');
-            const data = await res.json();
-            setProducts(data);
+            if (res.headers.get("content-type")?.includes("application/json")) {
+                const data = await res.json();
+                setProducts(data);
+            } else {
+                console.error('API did not return JSON');
+            }
         } catch (err) {
             console.error(err);
         }
@@ -129,17 +152,19 @@ const AdminProducts: React.FC = () => {
             const payload = { ...formData, imageUrls: finalImageUrls };
 
             if (editingId) {
-                await fetch(`/api/admin/products/${editingId}`, {
+                const res = await fetch(`/api/admin/products/${editingId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+                if (!res.ok) throw new Error('수정 실패');
             } else {
-                await fetch('/api/admin/products', {
+                const res = await fetch('/api/admin/products', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+                if (!res.ok) throw new Error('등록 실패');
             }
             closeForm();
             fetchProducts();
@@ -149,17 +174,25 @@ const AdminProducts: React.FC = () => {
         }
     };
 
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isFormOpen) closeForm();
+        };
+        document.addEventListener('keydown', handleEsc);
+        return () => document.removeEventListener('keydown', handleEsc);
+    }, [isFormOpen]);
+
     const closeForm = () => {
         setIsFormOpen(false);
         setEditingId(null);
-        setFormData({ name: '', price: 0, description: '', type: 'NORMAL', stockQuantity: 0, rentalAvailableCount: 0, active: true, imageUrls: [] });
+        setFormData({ name: '', price: 0, pointReward: 0, description: '', categoryId: '', stockQuantity: 0, rentalAvailableCount: 0, active: true, imageUrls: [] });
         setSelectedFiles([]);
         setPreviewUrls([]);
     };
 
     const openFormNew = () => {
         setEditingId(null);
-        setFormData({ name: '', price: 0, description: '', type: 'NORMAL', stockQuantity: 0, rentalAvailableCount: 0, active: true, imageUrls: [] });
+        setFormData({ name: '', price: 0, pointReward: 0, description: '', categoryId: '', stockQuantity: 0, rentalAvailableCount: 0, active: true, imageUrls: [] });
         setSelectedFiles([]);
         setPreviewUrls([]);
         setIsFormOpen(true);
@@ -167,7 +200,7 @@ const AdminProducts: React.FC = () => {
 
     const handleEdit = (product: Product) => {
         setEditingId(product.id);
-        setFormData({ ...product, imageUrls: product.imageUrls || [] });
+        setFormData({ ...product, categoryId: product.categoryId || '', imageUrls: product.imageUrls || [] });
         setSelectedFiles([]);
         setPreviewUrls([]);
         setIsFormOpen(true);
@@ -202,10 +235,16 @@ const AdminProducts: React.FC = () => {
                     });
                     const data = await res.json();
                     if (res.ok) {
-                        const quill = (document.querySelector('.ql-container') as any)?.__quill;
+                        const quill = quillRef.current?.getEditor();
                         if (quill) {
-                            const range = quill.getSelection();
-                            quill.insertEmbed(range.index, 'image', data.url);
+                            const range = quill.getSelection(true);
+                            if (range) {
+                                quill.insertEmbed(range.index, 'image', data.url);
+                            } else {
+                                // fallback if no selection 
+                                const len = quill.getLength();
+                                quill.insertEmbed(len, 'image', data.url);
+                            }
                         }
                     } else {
                         alert('이미지 업로드에 실패했습니다.');
@@ -235,42 +274,66 @@ const AdminProducts: React.FC = () => {
     const formats = [
         'header',
         'bold', 'italic', 'underline', 'strike',
-        'list', 'bullet',
+        'list',
         'link', 'image'
     ];
 
     return (
         <div className="admin-products-container">
-            <h2>상품 관리</h2>
+            <div className="admin-products-header">
+                <div>
+                    <h2>상품 관리</h2>
+                    <p className="header-desc">상품의 등록, 수정, 삭제를 관리합니다.</p>
+                </div>
+                <button className="btn-add-product" onClick={openFormNew}>
+                    <Plus size={18} /> 새 상품 등록
+                </button>
+            </div>
 
-            <button className="add-btn" onClick={openFormNew}>새 상품 등록</button>
-            <table className="products-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>상품명</th>
-                        <th>타입</th>
-                        <th>가격</th>
-                        <th>상태</th>
-                        <th>관리</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {products.map(p => (
-                        <tr key={p.id}>
-                            <td>{p.id}</td>
-                            <td>{p.name}</td>
-                            <td>{p.type === 'NORMAL' ? '일반상픔' : '대여상품'}</td>
-                            <td>{p.price.toLocaleString()}원</td>
-                            <td>{p.active ? '활성' : '비활성'}</td>
-                            <td>
-                                <button onClick={() => handleEdit(p)}>수정</button>
-                                <button onClick={() => handleDelete(p.id)} className="delete-btn">삭제</button>
-                            </td>
+            <div className="products-list-section">
+                <h3>등록된 상품 목록</h3>
+                <table className="products-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>상품명</th>
+                            <th>타입</th>
+                            <th>가격</th>
+                            <th>상태</th>
+                            <th>관리</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {products.map(p => (
+                            <tr key={p.id}>
+                                <td style={{ fontWeight: 700, color: 'var(--primary-color)' }}>{p.id}</td>
+                                <td>{p.name}</td>
+                                <td><span className="product-type-badge">{p.categoryName || p.type}</span></td>
+                                <td style={{ fontWeight: 600 }}>{p.price.toLocaleString()}원</td>
+                                <td>
+                                    {p.active ?
+                                        <span className="product-status-badge active">활성</span> :
+                                        <span className="product-status-badge inactive">비활성</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div className="action-btns">
+                                        <button onClick={() => handleEdit(p)} className="btn-edit-small"><Edit2 size={14} /> 수정</button>
+                                        <button onClick={() => handleDelete(p.id)} className="btn-delete-small"><Trash2 size={14} /> 삭제</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                        {products.length === 0 && (
+                            <tr>
+                                <td colSpan={6} className="empty-message">
+                                    등록된 상품이 없습니다. 새 상품을 등록해주세요.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
 
             {isFormOpen && (
                 <div className="product-modal-overlay" onClick={closeForm}>
@@ -286,24 +349,30 @@ const AdminProducts: React.FC = () => {
                             </div>
                             <div className="form-group">
                                 <label>타입</label>
-                                <select name="type" value={formData.type} onChange={handleChange}>
-                                    <option value="NORMAL">일반상품</option>
-                                    <option value="RENTAL">대여상품 (렌터카 등)</option>
+                                <select name="categoryId" value={formData.categoryId} onChange={handleChange}>
+                                    <option value="">-- 상품 타입 선택 --</option>
+                                    {categories.map(cat => (
+                                        <option key={cat.id} value={cat.id}>{cat.name} ({cat.code})</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="form-group">
                                 <label>가격</label>
                                 <input type="number" name="price" value={formData.price} onChange={handleChange} required />
                             </div>
+                            <div className="form-group">
+                                <label>구매 적립 포인트</label>
+                                <input type="number" name="pointReward" value={formData.pointReward || 0} onChange={handleChange} />
+                            </div>
 
-                            {formData.type === 'NORMAL' && (
+                            {selectedCategory?.hasStock && (
                                 <div className="form-group">
                                     <label>재고 수량</label>
                                     <input type="number" name="stockQuantity" value={formData.stockQuantity} onChange={handleChange} />
                                 </div>
                             )}
 
-                            {formData.type === 'RENTAL' && (
+                            {selectedCategory?.hasRentalPeriod && (
                                 <div className="form-group">
                                     <label>대여 가능 수량 (차량 대수 등)</label>
                                     <input type="number" name="rentalAvailableCount" value={formData.rentalAvailableCount} onChange={handleChange} />
@@ -313,6 +382,7 @@ const AdminProducts: React.FC = () => {
                             <div className="form-group" style={{ marginBottom: '50px' }}>
                                 <label>상세 설명</label>
                                 <ReactQuill
+                                    ref={quillRef}
                                     theme="snow"
                                     value={formData.description || ''}
                                     onChange={(value) => setFormData({ ...formData, description: value })}

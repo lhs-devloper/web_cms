@@ -11,12 +11,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/board")
 @RequiredArgsConstructor
+@Tag(name = "게시판", description = "게시판 CRUD 및 댓글 API")
 public class BoardController {
     @Autowired
     private BoardService boardService;
@@ -25,11 +29,13 @@ public class BoardController {
 
     private final com.lhsdev.cmsproject.service.CommentService commentService;
 
+    @Operation(summary = "게시판 목록", description = "전체 게시판 목록을 조회합니다.")
     @GetMapping({ "", "/" })
     public ResponseEntity<?> index() {
         return ResponseEntity.ok(boardMetaRepository.findAll());
     }
 
+    @Operation(summary = "게시글 목록", description = "특정 게시판의 게시글 목록을 조회합니다.")
     @GetMapping("/{boardId}")
     public ResponseEntity<?> list(@PathVariable String boardId,
             @AuthenticationPrincipal PrincipalDetails principal) {
@@ -49,6 +55,7 @@ public class BoardController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "게시글 상세", description = "게시글 상세 내용을 조회합니다.")
     @GetMapping("/{boardId}/view/{id}")
     public ResponseEntity<?> view(@PathVariable String boardId, @PathVariable Long id,
             @AuthenticationPrincipal PrincipalDetails principal) {
@@ -68,6 +75,7 @@ public class BoardController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "게시글 작성", description = "새 게시글을 작성합니다.")
     @PostMapping("/{boardId}/save")
     public ResponseEntity<?> save(@PathVariable String boardId,
             @RequestParam String title,
@@ -110,6 +118,7 @@ public class BoardController {
         }
     }
 
+    @Operation(summary = "게시글 수정", description = "게시글을 수정합니다.")
     @PostMapping("/{boardId}/update")
     public ResponseEntity<?> updatePost(@PathVariable String boardId,
             @RequestParam Long id,
@@ -137,6 +146,7 @@ public class BoardController {
         }
     }
 
+    @Operation(summary = "게시글 삭제", description = "게시글을 삭제합니다.")
     @PostMapping("/{boardId}/delete")
     public ResponseEntity<?> deletePost(@PathVariable String boardId,
             @RequestParam Long id,
@@ -153,6 +163,7 @@ public class BoardController {
         }
     }
 
+    @Operation(summary = "댓글 작성", description = "게시글에 댓글을 작성합니다.")
     @PostMapping("/{boardId}/comment/save")
     public ResponseEntity<?> saveComment(@PathVariable String boardId,
             @RequestParam Long postId,
@@ -194,6 +205,7 @@ public class BoardController {
         }
     }
 
+    @Operation(summary = "댓글 삭제", description = "댓글을 삭제합니다.")
     @PostMapping("/{boardId}/comment/delete")
     public ResponseEntity<?> deleteComment(@PathVariable String boardId,
             @RequestParam Long postId,

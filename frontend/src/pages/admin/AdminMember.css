@@ -26,8 +26,8 @@
 }
 
 .filter-input {
-    background: rgba(var(--shadow-rgb), 0.2);
-    border: 1px solid rgba(var(--glass-rgb), 0.1);
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
     color: var(--text-primary);
     padding: 0.6rem 1rem;
     border-radius: 6px;
@@ -72,7 +72,7 @@
     padding: 1.2rem;
     text-align: left;
     border-bottom: 1px solid rgba(var(--glass-rgb), 0.05);
-    color: #e0e0e0;
+    color: var(--text-color);
 }
 
 .member-table th {
@@ -136,8 +136,8 @@
 }
 
 .role-select {
-    background: rgba(var(--shadow-rgb), 0.3);
-    border: 1px solid rgba(var(--glass-rgb), 0.2);
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
     color: var(--text-primary);
     padding: 0.4rem;
     border-radius: 4px;

@@ -2,6 +2,7 @@ package com.lhsdev.cmsproject.config;
 
 import com.lhsdev.cmsproject.config.auth.CustomOAuth2UserService;
 import com.lhsdev.cmsproject.config.auth.CustomOAuth2SuccessHandler;
+import com.lhsdev.cmsproject.config.auth.RestAuthenticationEntryPoint;
 import com.lhsdev.cmsproject.config.auth.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +26,7 @@ public class SecurityConfig {
         private final CustomOAuth2UserService customOAuth2UserService;
         private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
         private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -37,13 +39,22 @@ public class SecurityConfig {
                                                                 "/api/files/**", "/signup", "/signupProc",
                                                                 "/api/admin/**", "/api/auth/**", "/api/board/**",
                                                                 "/api/global/**", "/api/uploads/**",
+                                                                "/api/products", "/api/products/**",
+                                                "/api/product-categories/**",
+                                                "/api/stories/**",
+                                                                "/api/membership/grades",
+                                                "/api/payments/configs",
+                                                                "/api/payments/kakao/success", "/api/payments/toss/success",
+                                                                "/api/payments/kcp/return",
                                                                 "/v3/api-docs/**", "/v3/api-docs.yaml",
                                                                 "/swagger-ui/**",
                                                                 "/swagger-ui.html", "/swagger-resources/**",
-                                                                "/webjars/**", "/error")
+                                                                "/webjars/**", "/docs.html", "/error")
                                                 .permitAll()
                                                 .requestMatchers("/api/v1/**", "/api/profile/**").hasRole("USER")
                                                 .anyRequest().authenticated())
+                                .exceptionHandling(ex -> ex
+                                                .authenticationEntryPoint(restAuthenticationEntryPoint))
                                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                                 .formLogin(form -> form
                                                 .loginPage("/login")

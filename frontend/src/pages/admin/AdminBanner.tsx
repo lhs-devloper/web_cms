@@ -83,6 +83,14 @@ const AdminBanner = () => {
         setIsModalOpen(false);
     };
 
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isModalOpen) handleCloseModal();
+        };
+        document.addEventListener('keydown', handleEsc);
+        return () => document.removeEventListener('keydown', handleEsc);
+    }, [isModalOpen]);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
         const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;

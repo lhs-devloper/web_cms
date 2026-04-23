@@ -6,6 +6,8 @@ import { LocationContent } from '../Location';
 
 interface SiteSetting {
     id?: string;
+    locationMapProvider: string;
+    locationKakaoMapIframe: string;
     locationAddress: string;
     locationPhone: string;
     locationEmail: string;
@@ -19,6 +21,8 @@ interface SiteSetting {
 }
 
 const defaultSetting: SiteSetting = {
+    locationMapProvider: 'google',
+    locationKakaoMapIframe: '',
     locationAddress: '',
     locationPhone: '',
     locationEmail: '',
@@ -132,19 +136,49 @@ const AdminLocationSetting = () => {
                 <section key={section} className="settings-section">
                     <div className="section-reorder-header">
                         <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <MoveVertical size={16} color="#94a3b8" /> 지도 정보 (Google Map Iframe)
+                            <MoveVertical size={16} color="#94a3b8" /> 지도 설정
                         </h4>
                         <div className="reorder-controls">
                             <button type="button" className="reorder-btn" onClick={() => moveSection(index, 'up')} disabled={index === 0}><ChevronUp size={16} /></button>
                             <button type="button" className="reorder-btn" onClick={() => moveSection(index, 'down')} disabled={index === sectionOrder.length - 1}><ChevronDown size={16} /></button>
                         </div>
                     </div>
-                    <p className="settings-section-desc">발급받은 iframe 소스 코드를 입력합니다.</p>
 
                     <div className="form-group">
-                        <label>Iframe URL (SRC 속성 값 전체를 넣으셔도 됩니다)</label>
-                        <textarea name="locationMapIframe" value={setting.locationMapIframe || ''} onChange={handleChange} className="form-control" rows={6} style={{ fontFamily: 'monospace' }}></textarea>
+                        <label>지도 제공자</label>
+                        <div style={{ display: 'flex', gap: '0.8rem', marginTop: '0.5rem' }}>
+                            {[{ id: 'google', name: 'Google Maps' }, { id: 'kakao', name: 'Kakao Map' }].map(p => (
+                                <label key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontSize: '0.95rem' }}>
+                                    <input
+                                        type="radio"
+                                        name="locationMapProvider"
+                                        value={p.id}
+                                        checked={(setting.locationMapProvider || 'google') === p.id}
+                                        onChange={handleChange}
+                                    />
+                                    {p.name}
+                                </label>
+                            ))}
+                        </div>
                     </div>
+
+                    {(setting.locationMapProvider || 'google') === 'google' ? (
+                        <>
+                            <p className="settings-section-desc">Google Maps에서 발급받은 iframe 소스 코드를 입력합니다.</p>
+                            <div className="form-group">
+                                <label>Iframe URL (SRC 속성 값 전체를 넣으셔도 됩니다)</label>
+                                <textarea name="locationMapIframe" value={setting.locationMapIframe || ''} onChange={handleChange} className="form-control" rows={6} style={{ fontFamily: 'monospace' }}></textarea>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <p className="settings-section-desc">카카오맵에서 "HTML 태그 복사"로 가져온 iframe 코드를 입력합니다.</p>
+                            <div className="form-group">
+                                <label>Kakao Map Iframe (HTML 태그 또는 src URL)</label>
+                                <textarea name="locationKakaoMapIframe" value={setting.locationKakaoMapIframe || ''} onChange={handleChange} className="form-control" rows={6} style={{ fontFamily: 'monospace' }}></textarea>
+                            </div>
+                        </>
+                    )}
                 </section>
             );
         }

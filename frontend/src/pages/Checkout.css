@@ -1,0 +1,166 @@
+.checkout-container {
+    max-width: 1000px;
+    margin: calc(var(--nav-height) + 40px) auto 40px;
+    padding: 0 20px;
+    display: flex;
+    gap: 30px;
+}
+
+.checkout-main {
+    flex: 2;
+    background: var(--panel-bg);
+    border-radius: 12px;
+    padding: 30px;
+    border: 1px solid var(--border-color);
+}
+
+.checkout-sidebar {
+    flex: 1;
+    background: var(--panel-bg);
+    border-radius: 12px;
+    padding: 30px;
+    border: 1px solid var(--border-color);
+    height: fit-content;
+    position: sticky;
+    top: calc(var(--nav-height) + 20px);
+}
+
+.checkout-section {
+    margin-bottom: 30px;
+}
+
+.checkout-section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.checkout-item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.checkout-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    background: var(--bg-darker);
+    border-radius: 8px;
+    align-items: center;
+}
+
+.checkout-item-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.checkout-item-info {
+    flex: 1;
+}
+
+.checkout-item-name {
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.checkout-item-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.checkout-item-price {
+    font-weight: 600;
+}
+
+.payment-methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+}
+
+.payment-method-card {
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg-darker);
+}
+
+.payment-method-card:hover {
+    border-color: var(--text-muted);
+}
+
+.payment-method-card.selected {
+    border-color: var(--primary-color);
+    background: var(--input-focus-bg);
+    color: var(--primary-color);
+}
+
+.payment-method-icon {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    color: var(--text-muted);
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    color: var(--title-color);
+}
+
+.btn-place-order {
+    width: 100%;
+    padding: 15px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.2s;
+}
+
+.btn-place-order:hover {
+    background: var(--secondary-color);
+}
+
+.btn-place-order:disabled {
+    background: var(--text-muted);
+    cursor: not-allowed;
+}
+
+.no-payment-methods {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-muted);
+    background: var(--bg-darker);
+    border-radius: 8px;
+    border: 1px dashed var(--border-color);
+}
+
+@media (max-width: 768px) {
+    .checkout-container {
+        flex-direction: column;
+    }
+}

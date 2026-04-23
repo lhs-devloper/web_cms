@@ -1,38 +1,73 @@
-import { ShoppingBag, Heart } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ShoppingBag } from 'lucide-react';
 import './FeaturedProducts.css';
 
-const products = [
-    {
-        id: 1,
-        name: "Aero Minimalist Chair",
-        category: "FURNITURE",
-        price: "₩320,000",
-        image: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?q=80&w=600&auto=format&fit=crop"
-    },
-    {
-        id: 2,
-        name: "Lumina Desk Lamp",
-        category: "LIGHTING",
-        price: "₩150,000",
-        image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?q=80&w=600&auto=format&fit=crop"
-    },
-    {
-        id: 3,
-        name: "Nordic Ceramic Vase",
-        category: "DECOR",
-        price: "₩85,000",
-        image: "https://images.unsplash.com/photo-1581783342308-f792dbdd27c5?q=80&w=600&auto=format&fit=crop"
-    },
-    {
-        id: 4,
-        name: "Velvet Lounge Sofa",
-        category: "FURNITURE",
-        price: "₩1,250,000",
-        image: "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?q=80&w=600&auto=format&fit=crop"
-    }
-];
+interface Product {
+    id: number;
+    name: string;
+    price: number;
+    imageUrls: string[];
+    category: string;
+    type: string;
+    categoryName: string;
+    hasRentalPeriod: boolean;
+}
 
 const FeaturedProducts = () => {
+    const [products, setProducts] = useState<Product[]>([]);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        fetch('/api/products')
+            .then(res => res.json())
+            .then(data => {
+                // Assuming data is an array of products, let's take up to 4 for Featured
+                setProducts(data.slice(0, 4));
+            })
+            .catch(err => console.error(err));
+    }, []);
+
+    const handleAddToCart = async (product: Product) => {
+        if (product.hasRentalPeriod) {
+            alert('대여 상품은 상세 페이지에서 일정을 선택해야 장바구니에 담을 수 있습니다.');
+            navigate(`/products/${product.id}`);
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/cart/add', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...(localStorage.getItem('accessToken') ? { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` } : {})
+                },
+                body: JSON.stringify({
+                    productId: product.id,
+                    quantity: 1,
+                    rentalStartDate: null,
+                    rentalEndDate: null
+                })
+            });
+
+            if (res.status === 401) {
+                alert('로그인이 필요합니다.');
+                navigate('/login');
+                return;
+            }
+
+            if (res.ok) {
+                if (confirm('장바구니에 담겼습니다. 장바구니로 이동하시겠습니까?')) {
+                    navigate('/cart');
+                }
+            } else {
+                alert('장바구니 담기에 실패했습니다.');
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
         <section className="featured-section container" id="featured">
             <div className="section-header">
@@ -40,25 +75,34 @@ const FeaturedProducts = () => {
                 <p className="section-subtitle">이번 시즌 가장 주목받는 프리미엄 에디션</p>
             </div>
 
-            <div className="product-grid">
-                {products.map((product) => (
-                    <div className="product-card" key={product.id}>
-                        <div className="product-image-wrapper">
-                            <img src={product.image} alt={product.name} className="product-image" />
-                            <div className="product-overlay">
-                                <button className="icon-btn-round" aria-label="Add to wishlist"><Heart size={18} /></button>
-                                <button className="btn-add-cart">
-                                    <ShoppingBag size={18} /> Add to Cart
-                                </button>
+            <div className="featured-grid">
+                {products.length > 0 ? products.map((product) => (
+                    <div className="featured-card" key={product.id}>
+                        <div className="featured-card-link" onClick={() => navigate(`/products/${product.id}`)}>
+                            <div className="featured-image">
+                                {product.imageUrls && product.imageUrls.length > 0 ? (
+                                    <img src={product.imageUrls[0]} alt={product.name} />
+                                ) : (
+                                    <div className="featured-no-image">No Image</div>
+                                )}
+                            </div>
+                            <div className="featured-info">
+                                <div className="featured-type-badge">
+                                    {product.categoryName || product.type}
+                                </div>
+                                <h3>{product.name}</h3>
+                                <p className="featured-price">{product.price.toLocaleString()}원</p>
                             </div>
                         </div>
-                        <div className="product-info">
-                            <span className="product-category">{product.category}</span>
-                            <h3 className="product-name">{product.name}</h3>
-                            <p className="product-price">{product.price}</p>
-                        </div>
+                        <button className="featured-cart-btn" onClick={() => handleAddToCart(product)}>
+                            <ShoppingBag size={16} /> Add to Cart
+                        </button>
                     </div>
-                ))}
+                )) : (
+                    <div style={{ textAlign: 'center', width: '100%', padding: '50px 0', gridColumn: '1 / -1' }}>
+                        <p>현재 등록된 프리미엄 에디션 상품이 없습니다.</p>
+                    </div>
+                )}
             </div>
         </section>
     );
