@@ -61,7 +61,7 @@ const Login = () => {
                 localStorage.setItem('accessToken', data.token);
                 console.log('Login success!');
                 // 이동 처리
-                if (data.user.role === 'ROLE_ADMIN') {
+                if (['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ADMIN', 'SUPER_ADMIN'].includes(data.user.role)) {
                     navigate('/admin');
                 } else {
                     navigate('/');

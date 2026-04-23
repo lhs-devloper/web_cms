@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Users, FileText, Settings, Image, LogOut, Menu as MenuIcon, Sun, Moon, ShoppingBag, BookOpen, X, Tag, Package, Award } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useSiteSetting } from '../contexts/SiteSettingContext';
@@ -7,9 +7,48 @@ import './AdminLayout.css';
 
 const AdminLayout = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const { theme, toggleTheme } = useTheme();
     const { setting } = useSiteSetting();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [user, setUser] = useState<any>(null);
+    const [authorized, setAuthorized] = useState(false);
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                navigate('/login');
+                return;
+            }
+            try {
+                const res = await fetch(`http://${window.location.hostname}:8080/api/profile`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const role = data.user?.role || data.user?.roleKey;
+                    if (role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'ROLE_ADMIN' || role === 'ROLE_SUPER_ADMIN') {
+                        setUser(data.user);
+                        setAuthorized(true);
+                    } else {
+                        alert('관리자 권한이 없습니다.');
+                        navigate('/');
+                    }
+                } else {
+                    alert('로그인이 필요합니다.');
+                    navigate('/login');
+                }
+            } catch (err) {
+                alert('인증 확인에 실패했습니다.');
+                navigate('/login');
+            }
+        };
+        checkAuth();
+    }, [navigate]);
+
+    if (!authorized) return null;
 
     return (
         <div className="admin-layout-container">
@@ -62,7 +101,7 @@ const AdminLayout = () => {
                             {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                         </button>
                         <div className="admin-user-info">
-                            최고관리자 (admin)님
+                            {(user?.role === 'SUPER_ADMIN' || user?.role === 'ROLE_SUPER_ADMIN') ? '최고관리자' : '관리자'} ({user?.name || 'admin'})님
                         </div>
                     </div>
                 </header>

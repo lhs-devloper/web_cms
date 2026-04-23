@@ -52,7 +52,7 @@ public class SecurityConfig {
                                                                 "/swagger-ui.html", "/swagger-resources/**",
                                                                 "/webjars/**", "/docs.html", "/error")
                                                 .permitAll()
-                                                .requestMatchers("/api/v1/**", "/api/profile/**").hasRole("USER")
+                                                .requestMatchers("/api/v1/**", "/api/profile/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
                                                 .anyRequest().authenticated())
                                 .exceptionHandling(ex -> ex
                                                 .authenticationEntryPoint(restAuthenticationEntryPoint))

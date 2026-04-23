@@ -1,5 +1,7 @@
 package com.lhsdev.cmsproject.controller.admin;
 
+import com.lhsdev.cmsproject.config.auth.PrincipalDetails;
+import com.lhsdev.cmsproject.domain.user.AuthProvider;
 import com.lhsdev.cmsproject.domain.user.Role;
 import com.lhsdev.cmsproject.domain.user.User;
 import com.lhsdev.cmsproject.repository.UserRepository;
@@ -7,6 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -19,6 +23,7 @@ import java.util.Map;
 public class AdminUserController {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Operation(summary = "회원 목록 조회", description = "키워드 또는 역할로 회원을 검색합니다.")
     @GetMapping
@@ -57,6 +62,30 @@ public class AdminUserController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", "Error updating role: " + e.getMessage()));
         }
+    }
+
+    @Operation(summary = "관리자 계정 생성", description = "최고관리자(SUPER_ADMIN)만 새 관리자 계정을 생성할 수 있습니다.")
+    @PostMapping("/create-admin")
+    public ResponseEntity<?> createAdmin(
+            @AuthenticationPrincipal PrincipalDetails principal,
+            @RequestParam String name,
+            @RequestParam String email,
+            @RequestParam String password) {
+        if (principal == null || principal.getUser().getRole() != Role.SUPER_ADMIN) {
+            return ResponseEntity.status(403).body(Map.of("message", "최고관리자만 관리자 계정을 생성할 수 있습니다."));
+        }
+        if (userRepository.findByEmail(email).isPresent()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "이미 사용 중인 이메일입니다."));
+        }
+        User admin = User.builder()
+                .name(name)
+                .email(email)
+                .password(passwordEncoder.encode(password))
+                .role(Role.ADMIN)
+                .provider(AuthProvider.LOCAL)
+                .build();
+        userRepository.save(admin);
+        return ResponseEntity.ok(Map.of("success", true, "message", "관리자 계정이 생성되었습니다."));
     }
 
     @Operation(summary = "회원 삭제", description = "회원을 삭제합니다.")

@@ -26,14 +26,15 @@ public class SetupController {
     @Operation(summary = "관리자 존재 확인", description = "관리자 계정이 존재하는지 확인합니다.")
     @GetMapping("/check")
     public ResponseEntity<?> checkAdmin() {
-        boolean hasAdmin = !userRepository.findByRole(Role.ADMIN).isEmpty();
+        boolean hasAdmin = !userRepository.findByRole(Role.SUPER_ADMIN).isEmpty()
+                || !userRepository.findByRole(Role.ADMIN).isEmpty();
         return ResponseEntity.ok(Map.of("hasAdmin", hasAdmin));
     }
 
     @Operation(summary = "초기 관리자 생성", description = "최초 관리자 계정을 생성합니다. 이미 관리자가 존재하면 거부됩니다.")
     @PostMapping("/init")
     public ResponseEntity<?> createAdmin(@RequestBody AdminSetupRequest request) {
-        if (!userRepository.findByRole(Role.ADMIN).isEmpty()) {
+        if (!userRepository.findByRole(Role.SUPER_ADMIN).isEmpty() || !userRepository.findByRole(Role.ADMIN).isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("message", "관리자 계정이 이미 존재합니다."));
         }
 
@@ -51,7 +52,7 @@ public class SetupController {
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.ADMIN)
+                .role(Role.SUPER_ADMIN)
                 .provider(AuthProvider.LOCAL)
                 .build();
 
