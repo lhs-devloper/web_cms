@@ -30,10 +30,11 @@
 #### 수정 후 - 모바일 상품 관리
 ![모바일 상품 관리](../screenshots/recheck_admin_04_mobile_products.png)
 
-### ISSUE-02: Secret Key / API Key 평문 노출 — OPEN (MEDIUM)
+### ISSUE-02: Secret Key / API Key 평문 노출 — RESOLVED
 
-- **현재:** 간편로그인/결제 설정에서 Secret Key 값이 마스킹 없이 평문 표시
-- **제안:** `type="password"` 적용 + 눈 아이콘 토글
+- **이전:** 간편로그인/결제 설정에서 Secret Key 값이 마스킹 없이 평문 표시
+- **현재:** `type="password"` 적용 + Eye/EyeOff 아이콘 토글로 마스킹/표시 전환 가능
+- **적용 범위:** AdminSocialSetting (Client Secret), AdminPaymentSetting (Secret Key)
 
 ### ISSUE-03: 모달 ESC 키 닫기 미지원 — RESOLVED
 
@@ -97,9 +98,8 @@
 3. **대시보드 실시간 데이터** — API 연동 완료
 4. **모달 버튼 색상** — 부분 개선
 
-### 잔여 이슈 (2건)
-1. **Secret Key 평문 노출** (MEDIUM) — 보안 키 마스킹 미적용
-2. **모달 버튼 색상 미세 차이** (LOW) — 메뉴(indigo) vs 상품(blue)
+### 잔여 이슈 (0건)
+- 모든 이슈 해결 완료
 
 ### 점수 (재점검)
 
@@ -109,5 +109,5 @@
 | 반응형 대응 | 4.0 | **8.5** |
 | 네비게이션/라우팅 | 9.0 | 9.0 |
 | 기능 완성도 | 8.0 | **9.0** |
-| 보안 | 6.0 | 6.5 |
-| **종합** | **7.1** | **8.3** |
+| 보안 | 6.0 | **8.5** |
+| **종합** | **7.1** | **8.7** |

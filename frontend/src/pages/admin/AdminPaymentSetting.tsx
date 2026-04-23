@@ -170,13 +170,19 @@ const AdminPaymentSetting = () => {
 
                         <div className="form-group">
                             <label>Secret Key (시크릿 키 / Admin 키)</label>
-                            <input
-                                type="text"
-                                value={payment.secretKey || ''}
-                                onChange={(e) => handleChange(payment.id, 'secretKey', e.target.value)}
-                                className="form-control"
-                                placeholder="Secret Key 입력"
-                            />
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type={visibleSecrets[`secret-${payment.id}`] ? 'text' : 'password'}
+                                    value={payment.secretKey || ''}
+                                    onChange={(e) => handleChange(payment.id, 'secretKey', e.target.value)}
+                                    className="form-control"
+                                    placeholder="Secret Key 입력"
+                                    style={{ paddingRight: '2.5rem' }}
+                                />
+                                <button type="button" onClick={() => toggleSecret(`secret-${payment.id}`)} style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0.3rem' }}>
+                                    {visibleSecrets[`secret-${payment.id}`] ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
                         </div>
 
                         <div className="form-group">
