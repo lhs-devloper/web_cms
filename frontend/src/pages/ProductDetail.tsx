@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Minus, Plus } from 'lucide-react';
+import { Minus, Plus, Star } from 'lucide-react';
 import './ProductDetail.css';
 
 interface Product {
@@ -24,6 +24,7 @@ const ProductDetail: React.FC = () => {
     const [rentalStartDate, setRentalStartDate] = useState('');
     const [rentalEndDate, setRentalEndDate] = useState('');
     const [mainImage, setMainImage] = useState<string>('');
+    const [reviews, setReviews] = useState<any[]>([]);
 
     useEffect(() => {
         fetch(`/api/products/${id}`)
@@ -35,6 +36,11 @@ const ProductDetail: React.FC = () => {
                 }
             })
             .catch(err => console.error(err));
+
+        fetch(`/api/reviews/product/${id}`)
+            .then(res => res.ok ? res.json() : [])
+            .then(data => setReviews(data))
+            .catch(() => {});
     }, [id]);
 
     const handleAddToCart = async () => {
@@ -156,6 +162,34 @@ const ProductDetail: React.FC = () => {
             <div className="product-detail-description">
                 <h3>상품 설명</h3>
                 <div className="description-content" dangerouslySetInnerHTML={{ __html: product.description }} />
+            </div>
+
+            <div className="product-detail-description" style={{ marginTop: '2rem' }}>
+                <h3>구매 리뷰 ({reviews.length})</h3>
+                {reviews.length === 0 ? (
+                    <p style={{ color: 'var(--text-muted)', padding: '1rem 0' }}>아직 작성된 리뷰가 없습니다.</p>
+                ) : (
+                    <div className="review-list">
+                        {reviews.map((review: any) => (
+                            <div key={review.id} className="review-item" style={{ borderBottom: '1px solid var(--glass-border)', padding: '1rem 0' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <strong>{review.userName}</strong>
+                                        <div style={{ display: 'flex', gap: '2px' }}>
+                                            {[1, 2, 3, 4, 5].map(n => (
+                                                <Star key={n} size={14} fill={n <= review.rating ? '#fbbf24' : 'none'} color={n <= review.rating ? '#fbbf24' : '#64748b'} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                        {new Date(review.createdAt).toLocaleDateString()}
+                                    </span>
+                                </div>
+                                <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>{review.content}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

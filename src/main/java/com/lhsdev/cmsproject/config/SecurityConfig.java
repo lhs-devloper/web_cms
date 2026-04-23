@@ -44,6 +44,7 @@ public class SecurityConfig {
                                                 "/api/product-categories/**",
                                                 "/api/stories/**",
                                                                 "/api/membership/grades",
+                                                "/api/reviews/product/**",
                                                 "/api/payments/configs",
                                                                 "/api/payments/kakao/success", "/api/payments/toss/success",
                                                                 "/api/payments/kcp/return",

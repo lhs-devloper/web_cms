@@ -9,6 +9,6 @@ import com.lhsdev.cmsproject.dto.payment.PaymentReadyResponse;
 
 public interface PaymentGateway {
     PaymentReadyResponse ready(Order order, PaymentMethod method);
-    PaymentApproveResponse approve(String pgToken, Order order);
+    PaymentApproveResponse approve(String pgToken, Order order, Payment payment);
     PaymentCancelResponse cancel(Payment payment);
 }

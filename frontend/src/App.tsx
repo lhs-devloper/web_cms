@@ -36,6 +36,7 @@ import AdminActivityLog from './pages/admin/AdminActivityLog';
 import AdminOrder from './pages/admin/AdminOrder';
 import AdminMembership from './pages/admin/AdminMembership';
 import Membership from './pages/Membership';
+import Signup from './pages/Signup';
 import Setup from './pages/Setup';
 import { SiteSettingProvider } from './contexts/SiteSettingContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -101,6 +102,7 @@ function App() {
 
             {/* 단독 페이지 영역 (레이아웃 없는 전체화면) */}
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
             <Route path="/login/success" element={<LoginSuccess />} />
 
             {/* 통합 관리자 영역 (CMS / GnuBoard 형태) */}

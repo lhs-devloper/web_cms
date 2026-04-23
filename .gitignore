@@ -48,6 +48,10 @@ docs/deploy.md
 ### Uploads ###
 uploads/
 
+### Docs (로컬 전용) ###
+docs/legacy/
+docs/task/
+
 ### Misc ###
 sidebar-snapshot.md
 hs_err_pid*.log

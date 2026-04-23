@@ -150,61 +150,90 @@ const Checkout: React.FC = () => {
                 throw new Error(errMessage);
             }
             
-            // 3. 결제 수단별 연동 처리 (현재 TOSS_PAY만 지원, 나머지는 임시 처리)
-            if (selectedMethod === 'TOSS_PAY') {
-                // 백엔드 order ID 캐싱 (토스페이는 redirect 방식이라 세션 스토리지가 안전함)
-                localStorage.setItem('checkout_internal_order_id', orderConfig.id.toString());
+            const readyData = await readyRes.json();
 
-                // 토스페이먼츠 연동을 위해 클라이언트 키 조회 필요
+            // 3. 결제 수단별 연동 처리
+            // 백엔드 order ID 캐싱 (redirect 후 복귀를 위해)
+            localStorage.setItem('checkout_internal_order_id', orderConfig.id.toString());
+
+            if (selectedMethod === 'TOSS_PAY') {
+                // 토스페이먼츠 클라이언트 SDK 연동
                 const configRes = await fetch('/api/payments/configs', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (configRes.ok) {
                     const configs = await configRes.json();
                     const tossConfig = configs.find((c: any) => c.provider === 'TOSSPAY');
-                    
+
                     if (tossConfig && tossConfig.clientKey) {
-                        try {
-                            // v1 직접 연동용 (Popup)
-                            const tossScript = document.createElement('script');
-                            tossScript.src = "https://js.tosspayments.com/v1/payment";
-                            tossScript.onload = () => {
-                                // @ts-ignore
-                                const tossPayments = window.TossPayments(tossConfig.clientKey);
-                                tossPayments.requestPayment('카드', {
-                                    amount: orderConfig.totalPrice,
-                                    // 백엔드 TossPaymentGateway의 approve 메서드에서 order.getOrderNumber()를 그대로 사용하므로
-                                    // readyData.pgTransactionId("TOSS_...")가 아닌 순수 orderNumber를 던져야 검증 매칭이 성공함!
-                                    orderId: orderConfig.orderNumber, 
-                                    orderName: items.length > 1 ? `${items[0].productName} 외 ${items.length - 1}건` : items[0].productName,
-                                    customerName: orderConfig.userName,
-                                    successUrl: `${window.location.origin}/payment/success`, 
-                                    failUrl: `${window.location.origin}/cart`,
-                                }).catch((e: any) => {
-                                    if (e.code === 'USER_CANCEL') {
-                                        alert('결제가 취소되었습니다.');
-                                    } else {
-                                        alert(e.message);
-                                    }
-                                    setIsLoading(false);
-                                });
-                            };
-                            document.body.appendChild(tossScript);
-                        } catch (e: any) {
-                            alert('결제창을 여는데 실패했습니다: ' + e.message);
-                            setIsLoading(false);
-                        }
+                        const tossScript = document.createElement('script');
+                        tossScript.src = "https://js.tosspayments.com/v1/payment";
+                        tossScript.onload = () => {
+                            // @ts-ignore
+                            const tossPayments = window.TossPayments(tossConfig.clientKey);
+                            tossPayments.requestPayment('카드', {
+                                amount: orderConfig.totalPrice,
+                                orderId: orderConfig.orderNumber,
+                                orderName: items.length > 1 ? `${items[0].productName} 외 ${items.length - 1}건` : items[0].productName,
+                                customerName: orderConfig.userName,
+                                successUrl: `${window.location.origin}/payment/success`,
+                                failUrl: `${window.location.origin}/cart`,
+                            }).catch((e: any) => {
+                                if (e.code === 'USER_CANCEL') {
+                                    alert('결제가 취소되었습니다.');
+                                } else {
+                                    alert(e.message);
+                                }
+                                setIsLoading(false);
+                            });
+                        };
+                        document.body.appendChild(tossScript);
                     } else {
-                        alert('토스 결제 설정(Client Key)가 반영되지 않았습니다. 관리자 페이지를 확인하세요.');
+                        alert('토스 결제 설정(Client Key)이 반영되지 않았습니다. 관리자 페이지를 확인하세요.');
                         setIsLoading(false);
                     }
                 } else {
                     alert('결제 설정 정보를 불러오지 못했습니다.');
                     setIsLoading(false);
                 }
+            } else if (selectedMethod === 'KAKAO_PAY') {
+                // 카카오페이: 백엔드에서 redirectUrl 반환 → 카카오 결제 페이지로 이동
+                if (readyData.redirectUrl) {
+                    window.location.href = readyData.redirectUrl;
+                } else {
+                    // 키 미설정 시 mock 콜백으로 approve 처리
+                    const approveRes = await fetch(`/api/payments/${orderConfig.id}/approve`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ pgToken: readyData.pgTransactionId })
+                    });
+                    if (approveRes.ok) {
+                        navigate('/payment/success?mock=true');
+                    } else {
+                        const errData = await approveRes.json();
+                        alert('결제 승인 실패: ' + (errData.message || '알 수 없는 오류'));
+                    }
+                    setIsLoading(false);
+                }
             } else {
-                alert(`[결제 시뮬레이션]\n\n총 금액: ${calculateTotal().toLocaleString()}원\n결제 수단: ${selectedMethod}\n\n결제 모듈은 추후 연동될 예정입니다!`);
-                setIsLoading(false);
+                // KCP (CARD, BANK_TRANSFER): 백엔드에서 redirectUrl 반환 → KCP 결제창 이동
+                if (readyData.redirectUrl && !readyData.redirectUrl.startsWith('/api/')) {
+                    window.location.href = readyData.redirectUrl;
+                } else {
+                    // 키 미설정 시 mock 콜백으로 approve 처리
+                    const approveRes = await fetch(`/api/payments/${orderConfig.id}/approve`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ pgToken: readyData.pgTransactionId })
+                    });
+                    if (approveRes.ok) {
+                        navigate('/payment/success?mock=true');
+                    } else {
+                        const errData = await approveRes.json();
+                        alert('결제 승인 실패: ' + (errData.message || '알 수 없는 오류'));
+                    }
+                    setIsLoading(false);
+                }
             }
         } catch (err: any) {
             console.error('Order/Payment Error:', err);

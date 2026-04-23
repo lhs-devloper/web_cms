@@ -24,6 +24,11 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    public List<Product> getActiveProducts() {
+        return productRepository.findByActiveTrue();
+    }
+
+    @Transactional(readOnly = true)
     public Product getProduct(Long id) {
         return productRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Product not found"));
     }

@@ -11,14 +11,9 @@ const LoginSuccess = () => {
         const token = params.get('token');
 
         if (token) {
-            // TODO: Redux/Zustand 또는 Context 에 유저 정보/토큰 세팅
-            console.log("로그인 성공! 발급받은 토큰:", token);
             localStorage.setItem("accessToken", token);
-
-            // 임시 전역 관리 처리 완료 후 메인 홈페이지(혹은 어드민)로 스무스하게 이동
             navigate('/', { replace: true });
         } else {
-            console.error("토큰을 찾을 수 없습니다.");
             navigate('/login');
         }
     }, [location, navigate]);

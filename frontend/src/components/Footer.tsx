@@ -1,5 +1,5 @@
-import { Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 import { useSiteSetting } from '../contexts/SiteSettingContext';
+import { Link } from 'react-router-dom';
 import './Footer.css';
 
 const Footer = () => {
@@ -14,39 +14,31 @@ const Footer = () => {
                         프리미엄 라이프스타일의 새로운 기준.<br />
                         변하지 않는 가치를 선사합니다.
                     </p>
-                    <div className="footer-socials">
-                        <a href="#" aria-label="Instagram"><Instagram size={20} /></a>
-                        <a href="#" aria-label="Facebook"><Facebook size={20} /></a>
-                        <a href="#" aria-label="Twitter"><Twitter size={20} /></a>
-                        <a href="#" aria-label="Youtube"><Youtube size={20} /></a>
-                    </div>
                 </div>
 
                 <div className="footer-links">
                     <div className="footer-col">
                         <h3>ABOUT US</h3>
                         <ul>
-                            <li><a href="#">Brand Story</a></li>
-                            <li><a href="#">Sustainability</a></li>
-                            <li><a href="#">Careers</a></li>
-                            <li><a href="#">Press</a></li>
+                            <li><Link to="/stories">브랜드 스토리</Link></li>
+                            <li><Link to="/about">소개</Link></li>
+                            <li><Link to="/location">오시는 길</Link></li>
                         </ul>
                     </div>
                     <div className="footer-col">
-                        <h3>CUSTOMER CARE</h3>
+                        <h3>SHOPPING</h3>
                         <ul>
-                            <li><a href="#">Contact Us</a></li>
-                            <li><a href="#">Shipping & Returns</a></li>
-                            <li><a href="#">FAQ</a></li>
-                            <li><a href="#">Track Order</a></li>
+                            <li><Link to="/products">전체 상품</Link></li>
+                            <li><Link to="/cart">장바구니</Link></li>
+                            <li><Link to="/orders">주문 내역</Link></li>
+                            <li><Link to="/membership">멤버십</Link></li>
                         </ul>
                     </div>
                     <div className="footer-col">
-                        <h3>LEGAL</h3>
+                        <h3>SUPPORT</h3>
                         <ul>
-                            <li><a href="#">Terms of Service</a></li>
-                            <li><a href="#">Privacy Policy</a></li>
-                            <li><a href="#">Cookie Policy</a></li>
+                            <li><Link to="/board">게시판</Link></li>
+                            <li><Link to="/mypage">마이페이지</Link></li>
                         </ul>
                     </div>
                 </div>
@@ -55,12 +47,6 @@ const Footer = () => {
             <div className="footer-bottom">
                 <div className="container">
                     <p>{setting?.footerCopyright || `© ${new Date().getFullYear()} ${setting?.siteName || 'CMS'}. All rights reserved.`}</p>
-                    <div className="payment-icons">
-                        {/* Dummy icons for payment methods */}
-                        <span className="payment-icon">VISA</span>
-                        <span className="payment-icon">MASTER</span>
-                        <span className="payment-icon">PAYPAL</span>
-                    </div>
                 </div>
             </div>
         </footer>

@@ -85,9 +85,9 @@ const Navbar = () => {
                     ) : (
                         <>
                             <li><Link to="/products">전체 상품</Link></li>
-                            <li><a href="#categories">카테고리</a></li>
-                            <li><a href="#featured">베스트</a></li>
-                            <li><a href="#about">브랜드 스토리</a></li>
+                            <li><Link to="/stories">브랜드 스토리</Link></li>
+                            <li><Link to="/about">소개</Link></li>
+                            <li><Link to="/board">게시판</Link></li>
                         </>
                     )}
                 </ul>

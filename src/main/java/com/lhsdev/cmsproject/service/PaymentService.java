@@ -92,7 +92,7 @@ public class PaymentService {
         String token = request.getPgToken() != null ? request.getPgToken() : request.getPaymentKey();
 
         try {
-            PaymentApproveResponse response = gateway.approve(token, order);
+            PaymentApproveResponse response = gateway.approve(token, order, payment);
 
             if (response.isSuccess()) {
                 payment.markPaid(response.getPgTransactionId());

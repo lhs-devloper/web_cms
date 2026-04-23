@@ -15,15 +15,15 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @Operation(summary = "상품 목록 조회", description = "전체 상품 목록을 조회합니다.")
+    @Operation(summary = "상품 목록 조회", description = "활성 상품 목록을 조회합니다.")
     @GetMapping
     public ResponseEntity<?> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts()); // Optionally filter active
+        return ResponseEntity.ok(productService.getActiveProducts());
     }
 
     @Operation(summary = "상품 상세 조회", description = "상품 ID로 상세 정보를 조회합니다.")
     @GetMapping("/{id}")
     public ResponseEntity<?> getProduct(@PathVariable Long id) {
-        return ResponseEntity.ok(productService.getProduct(id)); // Optionally check if active
+        return ResponseEntity.ok(productService.getProduct(id));
     }
 }

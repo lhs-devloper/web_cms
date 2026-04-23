@@ -20,6 +20,9 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [socialProviders, setSocialProviders] = useState<SocialProvider[]>([]);
     const [siteSetting, setSiteSetting] = useState<any>(null);
+    const [showResetModal, setShowResetModal] = useState(false);
+    const [resetEmail, setResetEmail] = useState('');
+    const [resetResult, setResetResult] = useState<{ type: 'success' | 'error'; message: string; tempPassword?: string } | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -59,8 +62,6 @@ const Login = () => {
             if (response.ok) {
                 const data = await response.json();
                 localStorage.setItem('accessToken', data.token);
-                console.log('Login success!');
-                // 이동 처리
                 if (['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ADMIN', 'SUPER_ADMIN'].includes(data.user.role)) {
                     navigate('/admin');
                 } else {
@@ -76,8 +77,67 @@ const Login = () => {
         }
     };
 
+    const handleResetPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setResetResult(null);
+        try {
+            const res = await fetch('/api/auth/reset-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: resetEmail })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setResetResult({ type: 'success', message: data.message, tempPassword: data.tempPassword });
+            } else {
+                setResetResult({ type: 'error', message: data.message || '오류가 발생했습니다.' });
+            }
+        } catch {
+            setResetResult({ type: 'error', message: '서버와의 통신에 실패했습니다.' });
+        }
+    };
+
     return (
         <div className="login-container">
+            {showResetModal && (
+                <div className="reset-modal-overlay" onClick={() => setShowResetModal(false)}>
+                    <div className="login-box animate-fade-in" style={{ position: 'relative', zIndex: 10 }} onClick={e => e.stopPropagation()}>
+                        <div className="login-header">
+                            <h2>비밀번호 찾기</h2>
+                            <p>가입한 이메일을 입력하면 임시 비밀번호가 발급됩니다.</p>
+                        </div>
+                        <form onSubmit={handleResetPassword} className="login-form">
+                            <label className="login-input-group">
+                                <div className="login-input-icon"><Mail size={18} /></div>
+                                <input
+                                    type="email"
+                                    placeholder="가입한 이메일을 입력해주세요"
+                                    value={resetEmail}
+                                    onChange={e => setResetEmail(e.target.value)}
+                                    required
+                                />
+                            </label>
+                            {resetResult && (
+                                <div style={{
+                                    padding: '0.8rem', borderRadius: '8px', fontSize: '0.9rem', marginBottom: '0.5rem',
+                                    background: resetResult.type === 'success' ? 'rgba(16,185,129,0.1)' : 'rgba(244,63,94,0.1)',
+                                    border: `1px solid ${resetResult.type === 'success' ? 'rgba(16,185,129,0.3)' : 'rgba(244,63,94,0.3)'}`,
+                                    color: resetResult.type === 'success' ? '#10b981' : '#f43f5e'
+                                }}>
+                                    <p>{resetResult.message}</p>
+                                    {resetResult.tempPassword && (
+                                        <p style={{ marginTop: '0.5rem', fontWeight: 'bold', fontSize: '1.1rem', letterSpacing: '2px' }}>
+                                            임시 비밀번호: {resetResult.tempPassword}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+                            <button type="submit" className="login-btn">임시 비밀번호 발급</button>
+                            <button type="button" className="login-btn" style={{ background: 'transparent', border: '1px solid var(--text-muted)', color: 'var(--text-muted)', marginTop: '0.5rem' }} onClick={() => setShowResetModal(false)}>닫기</button>
+                        </form>
+                    </div>
+                </div>
+            )}
             <div className="login-box animate-fade-in">
                 <div className="login-header">
                     {siteSetting?.logoUrl ? (
@@ -123,7 +183,7 @@ const Login = () => {
                             <span className="checkmark"></span>
                             아이디 저장
                         </label>
-                        <a href="#" className="forgot-password">비밀번호 찾기</a>
+                        <button type="button" className="forgot-password" onClick={() => { setShowResetModal(true); setResetResult(null); setResetEmail(''); }}>비밀번호 찾기</button>
                     </div>
 
                     <button type="submit" className="login-btn">

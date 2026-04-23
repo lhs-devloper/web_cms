@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Package, X } from 'lucide-react';
+import { ArrowLeft, Package, X, Star } from 'lucide-react';
 import './OrderHistory.css';
 
 const OrderHistory = () => {
     const [orders, setOrders] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
+    const [reviewModal, setReviewModal] = useState<{ orderId: number; orderItems: any[] } | null>(null);
+    const [reviewProductId, setReviewProductId] = useState<number | null>(null);
+    const [reviewRating, setReviewRating] = useState(5);
+    const [reviewContent, setReviewContent] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -107,12 +111,104 @@ const OrderHistory = () => {
                         alert('토스 결제 설정이 반영되지 않았습니다.');
                     }
                 }
+            } else if (method === 'KAKAO_PAY') {
+                const readyData = await readyRes.json();
+                localStorage.setItem('checkout_internal_order_id', order.id.toString());
+                if (readyData.redirectUrl) {
+                    window.location.href = readyData.redirectUrl;
+                } else {
+                    const approveRes = await fetch(`/api/payments/${order.id}/approve`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ pgToken: readyData.pgTransactionId })
+                    });
+                    if (approveRes.ok) {
+                        window.location.href = '/payment/success?mock=true';
+                    } else {
+                        const errData = await approveRes.json();
+                        alert('결제 승인 실패: ' + (errData.message || '알 수 없는 오류'));
+                    }
+                }
             } else {
-                alert(`[결제 시뮬레이션]\n\n총 금액: ${order.totalPrice.toLocaleString()}원\n결제 수단: ${method}\n\n결제 모듈은 추후 연동될 예정입니다!`);
+                // KCP (CARD, BANK_TRANSFER)
+                const readyData = await readyRes.json();
+                localStorage.setItem('checkout_internal_order_id', order.id.toString());
+                if (readyData.redirectUrl && !readyData.redirectUrl.startsWith('/api/')) {
+                    window.location.href = readyData.redirectUrl;
+                } else {
+                    const approveRes = await fetch(`/api/payments/${order.id}/approve`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ pgToken: readyData.pgTransactionId })
+                    });
+                    if (approveRes.ok) {
+                        window.location.href = '/payment/success?mock=true';
+                    } else {
+                        const errData = await approveRes.json();
+                        alert('결제 승인 실패: ' + (errData.message || '알 수 없는 오류'));
+                    }
+                }
             }
         } catch (err: any) {
             console.error('Retry Payment Error:', err);
             alert(err.message || '결제 진행 중 오류가 발생했습니다.');
+        }
+    };
+
+    const openReviewModal = (order: any) => {
+        setReviewModal({ orderId: order.id, orderItems: order.orderItems || [] });
+        setReviewProductId(order.orderItems?.[0]?.productId || null);
+        setReviewRating(5);
+        setReviewContent('');
+    };
+
+    const handleSubmitReview = async () => {
+        if (!reviewModal || !reviewProductId) return;
+        const token = localStorage.getItem('accessToken');
+        if (!token) { navigate('/login'); return; }
+
+        try {
+            const res = await fetch('/api/reviews', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({
+                    orderId: reviewModal.orderId,
+                    productId: reviewProductId,
+                    rating: reviewRating,
+                    content: reviewContent
+                })
+            });
+            if (res.ok) {
+                alert('리뷰가 등록되었습니다.');
+                setReviewModal(null);
+            } else {
+                const err = await res.json();
+                alert(err.message || '리뷰 등록에 실패했습니다.');
+            }
+        } catch {
+            alert('리뷰 등록 중 오류가 발생했습니다.');
+        }
+    };
+
+    const handleCancelOrder = async (orderId: number) => {
+        if (!confirm('정말로 이 주문을 취소하시겠습니까?')) return;
+        const token = localStorage.getItem('accessToken');
+        if (!token) { navigate('/login'); return; }
+        try {
+            const res = await fetch(`/api/orders/${orderId}/cancel`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                alert('주문이 취소되었습니다.');
+                setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'CANCELLED' } : o));
+                if (selectedOrder?.id === orderId) setSelectedOrder(null);
+            } else {
+                const err = await res.json();
+                alert(err.message || '주문 취소에 실패했습니다.');
+            }
+        } catch (err: any) {
+            alert('주문 취소 중 오류가 발생했습니다.');
         }
     };
 
@@ -175,8 +271,9 @@ const OrderHistory = () => {
                                     <div className="order-actions">
                                         <button className="btn-secondary" onClick={() => setSelectedOrder(order)}>주문 상세</button>
                                         {order.status === 'PENDING' && <button className="btn-primary-outline" onClick={() => handleRetryPayment(order)}>재결제</button>}
-                                        {order.status === 'CONFIRMED' && <button className="btn-danger-outline">주문 취소</button>}
-                                        {order.status === 'DELIVERED' && <button className="btn-primary-outline">리뷰 작성</button>}
+                                        {order.status === 'CONFIRMED' && <button className="btn-danger-outline" onClick={() => handleCancelOrder(order.id)}>주문 취소</button>}
+                                        {order.status === 'PENDING' && <button className="btn-danger-outline" onClick={() => handleCancelOrder(order.id)}>주문 취소</button>}
+                                        {order.status === 'DELIVERED' && <button className="btn-primary-outline" onClick={() => openReviewModal(order)}>리뷰 작성</button>}
                                     </div>
                                 </div>
                             </div>
@@ -242,16 +339,70 @@ const OrderHistory = () => {
 
                             <hr className="modal-divider" />
 
-                            <div className="detail-section mockup-section">
-                                <h4>배송지 정보 <span className="mock-badge">Mock</span></h4>
-                                <p><strong>수령인:</strong> {selectedOrder.userName}</p>
-                                <p><strong>연락처:</strong> 010-1234-5678</p>
-                                <p><strong>주소:</strong> 서울특별시 강남구 역삼동 123-45, 프레스티지 빌딩 10층</p>
-                                <p><strong>배송메모:</strong> 문 앞에 두고 가주세요.</p>
-                            </div>
+                            {(selectedOrder.trackingNumber || selectedOrder.trackingCarrier) && (
+                                <div className="detail-section">
+                                    <h4>배송 정보</h4>
+                                    <p><strong>수령인:</strong> {selectedOrder.userName}</p>
+                                    {selectedOrder.trackingCarrier && <p><strong>택배사:</strong> {selectedOrder.trackingCarrier}</p>}
+                                    {selectedOrder.trackingNumber && <p><strong>운송장번호:</strong> {selectedOrder.trackingNumber}</p>}
+                                    {selectedOrder.trackingMemo && <p><strong>배송메모:</strong> {selectedOrder.trackingMemo}</p>}
+                                </div>
+                            )}
                         </div>
                         <div className="order-modal-footer">
                             <button className="btn-primary" onClick={() => setSelectedOrder(null)}>확인</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* 리뷰 작성 모달 */}
+            {reviewModal && (
+                <div className="order-modal-overlay" onClick={() => setReviewModal(null)}>
+                    <div className="order-modal-content glass-panel animate-fade-in" style={{ maxWidth: '500px' }} onClick={e => e.stopPropagation()}>
+                        <div className="order-modal-header">
+                            <h3>리뷰 작성</h3>
+                            <button className="btn-close-icon" onClick={() => setReviewModal(null)}>
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <div className="order-modal-body">
+                            <div className="detail-section">
+                                <h4>상품 선택</h4>
+                                <select
+                                    value={reviewProductId || ''}
+                                    onChange={e => setReviewProductId(Number(e.target.value))}
+                                    style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid var(--glass-border)', background: 'var(--input-bg)', color: 'var(--text-primary)' }}
+                                >
+                                    {reviewModal.orderItems.map((item: any) => (
+                                        <option key={item.productId} value={item.productId}>{item.productName}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="detail-section" style={{ marginTop: '1rem' }}>
+                                <h4>평점</h4>
+                                <div style={{ display: 'flex', gap: '0.3rem' }}>
+                                    {[1, 2, 3, 4, 5].map(n => (
+                                        <button key={n} type="button" onClick={() => setReviewRating(n)}
+                                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.2rem' }}>
+                                            <Star size={24} fill={n <= reviewRating ? '#fbbf24' : 'none'} color={n <= reviewRating ? '#fbbf24' : '#64748b'} />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="detail-section" style={{ marginTop: '1rem' }}>
+                                <h4>리뷰 내용</h4>
+                                <textarea
+                                    value={reviewContent}
+                                    onChange={e => setReviewContent(e.target.value)}
+                                    placeholder="상품에 대한 솔직한 리뷰를 작성해주세요."
+                                    rows={4}
+                                    style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid var(--glass-border)', background: 'var(--input-bg)', color: 'var(--text-primary)', resize: 'vertical' }}
+                                />
+                            </div>
+                        </div>
+                        <div className="order-modal-footer">
+                            <button className="btn-secondary" onClick={() => setReviewModal(null)}>취소</button>
+                            <button className="btn-primary" onClick={handleSubmitReview}>리뷰 등록</button>
                         </div>
                     </div>
                 </div>

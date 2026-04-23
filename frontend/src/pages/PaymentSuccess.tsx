@@ -12,6 +12,7 @@ const PaymentSuccess = () => {
     const paymentKey = searchParams.get('paymentKey');
     const orderId = searchParams.get('orderId');
     const amount = searchParams.get('amount');
+    const isMock = searchParams.get('mock');
 
     const requestSent = useRef(false);
 
@@ -19,6 +20,14 @@ const PaymentSuccess = () => {
         const approvePayment = async () => {
             if (requestSent.current) return;
             requestSent.current = true;
+
+            // Mock 결제 (키 미설정 시 approve가 이미 처리된 경우)
+            if (isMock) {
+                localStorage.removeItem('checkout_internal_order_id');
+                setStatus('success');
+                setMessage('결제가 성공적으로 완료되었습니다.');
+                return;
+            }
 
             const internalOrderId = localStorage.getItem('checkout_internal_order_id');
             const token = localStorage.getItem('accessToken');
@@ -41,7 +50,7 @@ const PaymentSuccess = () => {
                     },
                     body: JSON.stringify({
                         paymentKey: paymentKey,
-                        orderId: orderId, // Toss orderId
+                        orderId: orderId,
                         amount: parseInt(amount, 10)
                     })
                 });
@@ -63,7 +72,7 @@ const PaymentSuccess = () => {
         if (status === 'processing') {
             approvePayment();
         }
-    }, [paymentKey, orderId, amount, status]);
+    }, [paymentKey, orderId, amount, isMock, status]);
 
     return (
         <div className="container" style={{ padding: 'var(--nav-height) 2rem 5rem 2rem', minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>

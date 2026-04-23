@@ -56,7 +56,7 @@ public class TossPaymentGateway implements PaymentGateway {
     }
 
     @Override
-    public PaymentApproveResponse approve(String paymentKey, Order order) {
+    public PaymentApproveResponse approve(String paymentKey, Order order, Payment payment) {
         PaymentConfig config = getConfig();
 
         if (!hasKeys(config)) {

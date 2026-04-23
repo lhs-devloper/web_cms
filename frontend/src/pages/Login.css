@@ -138,13 +138,33 @@
     user-select: none;
 }
 
-.login-options a {
+.login-options a,
+.login-options .forgot-password {
     color: var(--text-muted-alt);
     transition: color 0.3s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: inherit;
+    padding: 0;
+    text-decoration: none;
 }
 
-.login-options a:hover {
+.login-options a:hover,
+.login-options .forgot-password:hover {
     color: var(--primary-color);
+}
+
+.reset-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
 }
 
 .login-btn {

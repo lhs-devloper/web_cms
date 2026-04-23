@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -68,6 +69,34 @@ public class AuthController {
 
         userRepository.save(user);
         return ResponseEntity.ok(Map.of("message", "회원가입이 완료되었습니다."));
+    }
+
+    @Operation(summary = "비밀번호 재설정", description = "이메일로 임시 비밀번호를 발급합니다.")
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "이메일을 입력해주세요."));
+        }
+
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "등록되지 않은 이메일입니다."));
+        }
+
+        if (user.getProvider() != com.lhsdev.cmsproject.domain.user.AuthProvider.LOCAL) {
+            return ResponseEntity.badRequest().body(Map.of("message",
+                    "소셜 로그인 계정은 비밀번호를 재설정할 수 없습니다. " + user.getProvider().name() + " 로그인을 이용해주세요."));
+        }
+
+        String tempPassword = UUID.randomUUID().toString().substring(0, 8);
+        user.setPassword(passwordEncoder.encode(tempPassword));
+        userRepository.save(user);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "임시 비밀번호가 발급되었습니다. 로그인 후 비밀번호를 변경해주세요.",
+                "tempPassword", tempPassword
+        ));
     }
 }
 

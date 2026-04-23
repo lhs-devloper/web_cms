@@ -84,7 +84,7 @@ public class KakaoPaymentGateway implements PaymentGateway {
     }
 
     @Override
-    public PaymentApproveResponse approve(String pgToken, Order order) {
+    public PaymentApproveResponse approve(String pgToken, Order order, Payment payment) {
         PaymentConfig config = getConfig();
 
         if (!hasKeys(config)) {
@@ -95,11 +95,12 @@ public class KakaoPaymentGateway implements PaymentGateway {
         }
 
         String cid = getCid(config);
+        String tid = payment.getPgTransactionId(); // ready()에서 저장된 tid
         RestClient restClient = RestClient.builder().baseUrl(config.getApiUrl()).build();
 
         Map<String, Object> body = Map.of(
                 "cid", cid,
-                "tid", pgToken,
+                "tid", tid,
                 "partner_order_id", order.getOrderNumber(),
                 "partner_user_id", order.getUser().getId().toString(),
                 "pg_token", pgToken

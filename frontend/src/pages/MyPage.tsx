@@ -188,10 +188,45 @@ const MyPage = () => {
                         setIsRetrying(false);
                     }
                 }
+            } else if (retryMethod === 'KAKAO_PAY') {
+                const readyData = await readyRes.json();
+                localStorage.setItem('checkout_internal_order_id', retryOrder.id.toString());
+                if (readyData.redirectUrl) {
+                    window.location.href = readyData.redirectUrl;
+                } else {
+                    const approveRes = await fetch(`/api/payments/${retryOrder.id}/approve`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ pgToken: readyData.pgTransactionId })
+                    });
+                    if (approveRes.ok) {
+                        window.location.href = '/payment/success?mock=true';
+                    } else {
+                        const errData = await approveRes.json();
+                        alert('결제 승인 실패: ' + (errData.message || '알 수 없는 오류'));
+                        setIsRetrying(false);
+                    }
+                }
             } else {
-                alert(`[결제 시뮬레이션]\n\n총 금액: ${retryOrder.totalPrice.toLocaleString()}원\n결제 수단: ${retryMethod}\n\n결제 모듈은 추후 연동될 예정입니다!`);
-                setIsRetrying(false);
-                setRetryOrder(null);
+                // KCP (CARD, BANK_TRANSFER)
+                const readyData = await readyRes.json();
+                localStorage.setItem('checkout_internal_order_id', retryOrder.id.toString());
+                if (readyData.redirectUrl && !readyData.redirectUrl.startsWith('/api/')) {
+                    window.location.href = readyData.redirectUrl;
+                } else {
+                    const approveRes = await fetch(`/api/payments/${retryOrder.id}/approve`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ pgToken: readyData.pgTransactionId })
+                    });
+                    if (approveRes.ok) {
+                        window.location.href = '/payment/success?mock=true';
+                    } else {
+                        const errData = await approveRes.json();
+                        alert('결제 승인 실패: ' + (errData.message || '알 수 없는 오류'));
+                        setIsRetrying(false);
+                    }
+                }
             }
         } catch (err: any) {
             console.error('Retry Payment Error:', err);
@@ -201,7 +236,6 @@ const MyPage = () => {
     };
 
     const handleLogout = () => {
-        // TODO: 실제 로그아웃 처리 (localStorage 토큰 삭제 및 백엔드 로그아웃 API 호출)
         localStorage.removeItem('accessToken');
         window.location.href = '/';
     };
