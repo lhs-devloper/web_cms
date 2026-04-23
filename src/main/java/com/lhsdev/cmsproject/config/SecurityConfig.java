@@ -34,10 +34,11 @@ public class SecurityConfig {
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .csrf(AbstractHttpConfigurer::disable)
                                 .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/", "/css/**", "/images/**", "/js/**", "/uploads/**",
+                                                .requestMatchers("/", "/index.html", "/favicon.ico",
+                                                                "/css/**", "/images/**", "/js/**", "/uploads/**",
                                                                 "/h2-console/**", "/profile", "/admin/**", "/board/**",
                                                                 "/api/files/**", "/signup", "/signupProc",
-                                                                "/api/admin/**", "/api/auth/**", "/api/board/**",
+                                                                "/api/admin/**", "/api/auth/**", "/api/setup/**", "/api/board/**",
                                                                 "/api/global/**", "/api/uploads/**",
                                                                 "/api/products", "/api/products/**",
                                                 "/api/product-categories/**",
@@ -56,12 +57,7 @@ public class SecurityConfig {
                                 .exceptionHandling(ex -> ex
                                                 .authenticationEntryPoint(restAuthenticationEntryPoint))
                                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                                .formLogin(form -> form
-                                                .loginPage("/login")
-                                                .loginProcessingUrl("/loginProc")
-                                                // .defaultSuccessUrl("/") // SSR(Thymeleaf용) 방식 대신 프론트엔드 연동용으로 제거 또는
-                                                // API응답 등 수정 필요. (현재는 보류)
-                                                .permitAll())
+                                .formLogin(AbstractHttpConfigurer::disable)
                                 .oauth2Login(oauth2 -> oauth2
                                                 .loginPage("/login")
                                                 .successHandler(customOAuth2SuccessHandler) // 핵심: 커스텀 성공 핸들러 장착

@@ -38,9 +38,33 @@ import AdminMembership from './pages/admin/AdminMembership';
 import Membership from './pages/Membership';
 import { SiteSettingProvider } from './contexts/SiteSettingContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      try {
+        const res = await fetch(`http://${window.location.hostname}:8080/api/setup/check`);
+        if (res.ok) {
+          const data = await res.json();
+          if (!data.hasAdmin) {
+            window.location.href = `http://${window.location.hostname}:8080`;
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('Setup check failed:', err);
+      }
+      setReady(true);
+    };
+    checkAdmin();
+  }, []);
+
+  if (!ready) return null;
+
   return (
     <ThemeProvider>
       <SiteSettingProvider>

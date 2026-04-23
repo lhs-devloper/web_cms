@@ -36,3 +36,18 @@ out/
 ### VS Code ###
 .vscode/
 backup/
+
+### Deploy (로컬 전용) ###
+docs/deploy.md
+
+### Claude Code ###
+.claude/
+.mcp.json
+.playwright-mcp/
+
+### Uploads ###
+uploads/
+
+### Misc ###
+sidebar-snapshot.md
+hs_err_pid*.log

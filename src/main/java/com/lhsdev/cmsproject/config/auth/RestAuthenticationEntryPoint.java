@@ -20,16 +20,11 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException authException) throws IOException {
         String requestUri = request.getRequestURI();
 
-        if (requestUri.startsWith("/api/")) {
-            // API 요청: 401 JSON 응답
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(
-                    objectMapper.writeValueAsString(Map.of("message", "로그인이 필요합니다."))
-            );
-        } else {
-            // 페이지 요청: /login으로 리다이렉트 (기존 동작 유지)
-            response.sendRedirect("/login");
-        }
+        // 모든 인증 실패 요청에 401 JSON 응답 (로그인 리다이렉트 제거)
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(
+                objectMapper.writeValueAsString(Map.of("message", "로그인이 필요합니다."))
+        );
     }
 }

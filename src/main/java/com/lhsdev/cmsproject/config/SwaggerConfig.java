@@ -119,6 +119,30 @@ public class SwaggerConfig {
     }
 
     @Bean
+    public GroupedOpenApi storyApi() {
+        return GroupedOpenApi.builder()
+                .group("11. 스토리 (Story)")
+                .pathsToMatch("/api/stories/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi productCategoryApi() {
+        return GroupedOpenApi.builder()
+                .group("12. 상품카테고리 (Category)")
+                .pathsToMatch("/api/product-categories/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi membershipApi() {
+        return GroupedOpenApi.builder()
+                .group("13. 멤버십 (Membership)")
+                .pathsToMatch("/api/membership/**")
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi allApi() {
         return GroupedOpenApi.builder()
                 .group("전체 API")

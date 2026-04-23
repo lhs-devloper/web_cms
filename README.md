@@ -15,7 +15,7 @@
 | **ORM** | Spring Data JPA |
 | **인증** | Spring Security, OAuth2 (Google, Naver, Kakao, Github), JWT |
 | **결제** | TossPay, KakaoPay, KCP |
-| **API 문서** | Springdoc OpenAPI (Swagger UI) |
+| **API 문서** | Springdoc OpenAPI (Swagger UI), ReDoc |
 
 ---
 
@@ -26,7 +26,7 @@ cmsproject/
 ├── src/                          # Spring Boot 백엔드
 │   └── main/
 │       ├── java/com/lhsdev/cmsproject/
-│       │   ├── api/              # 외부 API 연동
+│       │   ├── api/              # 외부 API 연동 (결제 게이트웨이 등)
 │       │   ├── config/           # Security, OAuth2, JWT, Swagger, CORS
 │       │   ├── controller/       # REST API 엔드포인트
 │       │   │   ├── admin/        # 관리자 전용 API
@@ -45,6 +45,7 @@ cmsproject/
 │   │   └── pages/                # 페이지 컴포넌트
 │   │       └── admin/            # 관리자 페이지
 │   └── vite.config.ts
+├── scripts/                      # 배포 자동화 스크립트
 ├── uploads/                      # 업로드 파일 저장소
 ├── build.gradle
 └── settings.gradle
@@ -144,7 +145,38 @@ git clone <repository-url> /opt/cmsproject
 cd /opt/cmsproject
 ```
 
-### 4단계: Backend 설정
+### 4단계: 환경변수 설정
+
+#### 필수 환경변수
+```bash
+# 데이터베이스
+DB_URL=jdbc:mariadb://localhost:3306/cmsproject
+DB_USERNAME=cmsuser
+DB_PASSWORD=your_password
+
+# JWT 시크릿 키 (운영 환경에서 반드시 변경)
+JWT_SECRET=your-very-long-secret-key-at-least-256-bits
+```
+
+#### 선택 환경변수 (결제 연동)
+```bash
+# NHN KCP
+KCP_SITE_CD=
+KCP_SITE_KEY=
+
+# 카카오페이
+KAKAO_PAY_ADMIN_KEY=
+
+# 토스페이먼츠
+TOSS_SECRET_KEY=
+```
+
+> 결제 키가 설정되지 않으면 stub 모드로 동작합니다 (실제 결제 없이 시뮬레이션).
+
+#### 선택 환경변수 (소셜 로그인)
+소셜 로그인 키는 관리자 패널 > 환경설정 > 간편로그인 설정에서 UI로 관리합니다.
+
+### 5단계: Backend 설정
 
 `src/main/resources/application.yaml` 파일을 운영 환경에 맞게 수정합니다.
 
@@ -170,28 +202,14 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
-
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: YOUR_GOOGLE_CLIENT_ID
-            client-secret: YOUR_GOOGLE_CLIENT_SECRET
-          naver:
-            client-id: YOUR_NAVER_CLIENT_ID
-            client-secret: YOUR_NAVER_CLIENT_SECRET
-          kakao:
-            client-id: YOUR_KAKAO_CLIENT_ID
-            client-secret: YOUR_KAKAO_CLIENT_SECRET
-          github:
-            client-id: YOUR_GITHUB_CLIENT_ID
-            client-secret: YOUR_GITHUB_CLIENT_SECRET
 ```
 
-> **주의**: OAuth2 소셜 로그인이 필요 없는 경우, 해당 registration 항목을 제거하거나 dummy 값을 유지하면 됩니다.
+또는 `application-prod.yaml`을 생성하여 프로필 분리:
+```bash
+java -jar cmsproject-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
+```
 
-### 5단계: Backend 빌드 및 실행
+### 6단계: Backend 빌드 및 실행
 
 ```bash
 cd /opt/cmsproject
@@ -209,7 +227,23 @@ nohup java -jar build/libs/cmsproject-0.0.1-SNAPSHOT.jar \
 tail -f /var/log/cmsproject/app.log
 ```
 
-### 6단계: Frontend 빌드
+### 7단계: 초기 관리자 설정
+
+백엔드 서버 시작 후 **초기 설정 페이지**가 표시됩니다.
+
+1. 브라우저에서 `http://서버IP:8080` 접속
+2. 관리자 이름, 이메일, 비밀번호 입력
+3. "관리자 계정 생성" 클릭
+4. 설정 완료 후 프론트엔드 배포 진행
+
+> **중요:** 관리자 계정이 생성되기 전에는 프론트엔드가 자동으로 백엔드 초기 설정 페이지로 리다이렉트됩니다.
+
+| Method | URL | 설명 |
+|--------|-----|------|
+| GET | `/api/setup/check` | 관리자 존재 여부 확인 |
+| POST | `/api/setup/init` | 초기 관리자 생성 (관리자 없을 때만) |
+
+### 8단계: Frontend 빌드
 
 ```bash
 cd /opt/cmsproject/frontend
@@ -222,7 +256,7 @@ npm run build
 # 빌드 결과물: frontend/dist/
 ```
 
-### 7단계: Nginx 설정
+### 9단계: Nginx 설정
 
 `/etc/nginx/sites-available/cmsproject` 파일을 생성합니다.
 
@@ -252,13 +286,35 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # Swagger UI (필요 시)
+    # OAuth2 리다이렉트 프록시
+    location /oauth2/ {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /login/oauth2/ {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Swagger UI / API 문서
     location /swagger-ui/ {
         proxy_pass http://localhost:8080;
         proxy_set_header Host $host;
     }
 
     location /v3/api-docs {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+    }
+
+    location /docs.html {
         proxy_pass http://localhost:8080;
         proxy_set_header Host $host;
     }
@@ -280,7 +336,7 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-### 8단계: HTTPS 설정 (선택, 권장)
+### 10단계: HTTPS 설정 (선택, 권장)
 
 ```bash
 # Certbot 설치
@@ -289,7 +345,7 @@ sudo apt install certbot python3-certbot-nginx -y
 # SSL 인증서 발급
 sudo certbot --nginx -d your-domain.com
 
-# 자동 갱신 확인
+# 자동 갱신 확인 (Let's Encrypt는 90일 유효, 자동 갱신됨)
 sudo certbot renew --dry-run
 ```
 
@@ -336,21 +392,51 @@ sudo journalctl -u cmsproject -f
 
 ---
 
+## 배포 아키텍처
+
+### 개발 환경
+```
+[브라우저]
+   ├── http://localhost:5173  → Vite Dev Server (프론트엔드)
+   └── http://localhost:8080  → Spring Boot (백엔드 + 초기설정)
+       └── /api/*  ← Vite Proxy
+```
+
+### 운영 환경 (Nginx)
+```
+[브라우저]
+   └── http://yourdomain.com
+       ├── /*          → Nginx → frontend/dist (정적 파일)
+       ├── /api/*      → Nginx → Spring Boot :8080 (API)
+       ├── /oauth2/*   → Nginx → Spring Boot :8080 (소셜 로그인)
+       └── /uploads/*  → Nginx → Spring Boot :8080 (파일)
+```
+
+---
+
 ## 배포 체크리스트
 
 새 사이트를 찍어낼 때마다 아래 항목을 확인하세요.
 
-- [ ] MariaDB 데이터베이스 생성 완료
-- [ ] `application.yaml` DB 접속 정보 수정
-- [ ] `application.yaml` OAuth2 클라이언트 정보 수정 (필요 시)
-- [ ] 업로드 디렉토리 생성 및 권한 설정 (`uploads/`)
-- [ ] Backend JAR 빌드 완료
-- [ ] Frontend `npm run build` 완료
-- [ ] Nginx 설정 파일 생성 및 도메인 설정
+### 배포 전
+- [ ] 환경변수 설정 (DB, JWT Secret)
+- [ ] 백엔드 빌드 성공 확인
+- [ ] 프론트엔드 빌드 성공 확인
+
+### 최초 배포 시
+- [ ] 백엔드 서버 실행
+- [ ] `http://서버IP:8080` 접속하여 초기 관리자 설정
+- [ ] 프론트엔드 배포 (Nginx)
+- [ ] 프론트엔드 접속 확인
+- [ ] 관리자 로그인 → 관리자 패널 접속 확인
+
+### 설정 확인
+- [ ] 관리자 > SEO & 브랜드 기본 설정
+- [ ] 관리자 > 간편로그인 설정 (소셜 키 입력)
+- [ ] 관리자 > 결제(PG) 연동 설정 (결제 키 입력)
+- [ ] 관리자 > 메뉴 관리 (네비게이션 구성)
 - [ ] HTTPS 인증서 발급 (운영 환경)
-- [ ] systemd 서비스 등록 (선택)
-- [ ] Swagger UI 접속 확인: `http://your-domain.com/swagger-ui.html`
-- [ ] 관리자 로그인 확인
+- [ ] systemd 서비스 등록
 
 ---
 
@@ -372,8 +458,28 @@ npm run dev
 
 ## API 문서
 
-전체 REST API 명세는 **[API_REFERENCE.md](./docs/API_REFERENCE.md)** 를 참조하세요.
+| 문서 | 경로 | 설명 |
+|------|------|------|
+| Swagger UI | `/swagger-ui.html` | 인터랙티브 API 테스트 |
+| ReDoc | `/docs.html` | 읽기 전용 API 문서 (그룹별 전환 가능) |
+| OpenAPI JSON | `/v3/api-docs` | OpenAPI 3.0 스펙 |
 
-운영 중인 서버에서는 Swagger UI로도 확인할 수 있습니다:
-- Swagger UI: `http://your-domain.com/swagger-ui.html`
-- OpenAPI JSON: `http://your-domain.com/v3/api-docs`
+### API 그룹
+
+| 번호 | 그룹 | 경로 패턴 |
+|------|------|----------|
+| 01 | 인증 (Auth) | `/api/auth/**` |
+| 02 | 상품 (Product) | `/api/products/**` |
+| 03 | 장바구니 (Cart) | `/api/cart/**` |
+| 04 | 주문 (Order) | `/api/orders/**` |
+| 05 | 결제 (Payment) | `/api/payments/**` |
+| 06 | 게시판 (Board) | `/api/board/**` |
+| 07 | 프로필 (Profile) | `/api/profile/**` |
+| 08 | 공통 (Global) | `/api/global/**` |
+| 09 | 관리자 (Admin) | `/api/admin/**` |
+| 10 | 파일 (File) | `/api/files/**` |
+| 11 | 스토리 (Story) | `/api/stories/**` |
+| 12 | 상품카테고리 | `/api/product-categories/**` |
+| 13 | 멤버십 | `/api/membership/**` |
+
+전체 REST API 명세는 **[API_REFERENCE.md](./docs/API_REFERENCE.md)** 를 참조하세요.
